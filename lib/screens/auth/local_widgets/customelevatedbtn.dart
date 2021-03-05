@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class CustomElevatedButton extends StatelessWidget {
   final title;
+  final onPressed;
   final double width;
   final double fontSize;
   const CustomElevatedButton({
     @required this.title,
+    @required this.onPressed,
     this.width: 4.0,
     this.fontSize: 17.0,
     Key key,
@@ -14,7 +16,7 @@ class CustomElevatedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.all(0.0),
         shape: new RoundedRectangleBorder(

@@ -21,7 +21,7 @@ class BottomNavBarWidget extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.home,
-              color: getColor(1),
+              color: getColor(0),
               size: 32,
             ),
             label: 'Home',
@@ -29,7 +29,7 @@ class BottomNavBarWidget extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.category,
-              color: getColor(2),
+              color: getColor(1),
               size: 23,
             ),
             label: 'Category',
@@ -45,7 +45,7 @@ class BottomNavBarWidget extends StatelessWidget {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.file_download,
-              color: getColor(2),
+              color: getColor(3),
               size: 23,
             ),
             label: 'Downloads',

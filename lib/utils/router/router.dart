@@ -17,7 +17,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case MyBottomNavBarRoute:
       return _getPageRoute(
           MyBottomNavBarPage(
-            selectedIndex: settings?.arguments ?? 1,
+            selectedIndex: settings?.arguments ?? 0,
           ),
           settings);
 

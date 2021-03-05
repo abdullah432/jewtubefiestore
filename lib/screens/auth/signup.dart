@@ -3,9 +3,7 @@ import 'package:jewtubefirestore/utils/locator.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/responsive_ui.dart';
 import 'package:jewtubefirestore/utils/router/routing_names.dart';
-
 import 'local_widgets/custom_shape.dart';
-import 'local_widgets/customappbar.dart';
 import 'local_widgets/customelevatedbtn.dart';
 import 'local_widgets/textformfield.dart';
 
@@ -57,6 +55,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: _height / 35,
                 ),
                 CustomElevatedButton(
+                  onPressed: () {
+                    locator<NavigationService>()
+                        .navigateAndReplaceTo(MyBottomNavBarRoute);
+                  },
                   title: 'SIGN UP',
                   width: _large
                       ? _width / 4
