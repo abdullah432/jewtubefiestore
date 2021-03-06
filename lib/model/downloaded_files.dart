@@ -6,10 +6,11 @@ class DownloadedFile {
   String fileLocation;
   String downloadTime;
 
-  DownloadedFile(
-      {@required this.fileLocation,
-      @required this.mp4Url,
-      @required this.downloadTime});
+  DownloadedFile({
+    @required this.fileLocation,
+    @required this.mp4Url,
+    @required this.downloadTime,
+  });
 
   //SQLFlite only get and return value in form of map
 

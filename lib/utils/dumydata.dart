@@ -1,3 +1,4 @@
+import 'package:jewtubefirestore/model/channel.dart';
 import 'package:jewtubefirestore/model/video.dart';
 
 class DumyData {
@@ -7,6 +8,12 @@ class DumyData {
       'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
   static String videoThumbnail =
       'https://upload.wikimedia.org/wikipedia/commons/3/31/Big.Buck.Bunny.-.Frank.Bunny.png';
+  static List<Channel> channelList = [
+    Channel(
+        channelID: 'channelID', channelName: 'channelName', imgUrl: pewdieurl),
+    Channel(
+        channelID: 'channelID', channelName: 'channelName', imgUrl: pewdieurl),
+  ];
   static List<VideoModel> videosList = [
     VideoModel(
       channelID: 'channelID',

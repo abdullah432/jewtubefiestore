@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/video.dart';
-import 'package:jewtubefirestore/screens/home/local_widgets/videoItemWidget.dart';
+import 'package:jewtubefirestore/widgets/videoItemWidget.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:jewtubefirestore/utils/dumydata.dart';
 

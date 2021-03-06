@@ -14,7 +14,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:share/share.dart';
-
 import 'offline_vidoe_play.dart';
 
 class DownloadFilesPage extends StatefulWidget {
@@ -151,10 +150,11 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
                       GestureDetector(
                         onTap: () {
                           showAlertDialog(
-                              context,
-                              "Delete",
-                              "Are you sure you want to delete this video",
-                              index);
+                            context,
+                            "Delete",
+                            "Are you sure you want to delete this video",
+                            index,
+                          );
                         },
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -195,7 +195,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
         title: Text(title),
         content: Text(message),
         actions: [
-          FlatButton(
+          TextButton(
             child: Text('No'),
             onPressed: () {
               Navigator.pop(context);

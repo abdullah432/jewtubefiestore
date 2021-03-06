@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/utils/dumydata.dart';
-import 'local_widgets/videoItemWidget.dart';
+import '../../widgets/videoItemWidget.dart';
 
 class HomeScreen extends StatefulWidget {
   @override

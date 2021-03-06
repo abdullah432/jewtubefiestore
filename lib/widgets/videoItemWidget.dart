@@ -9,16 +9,20 @@ class VideoItemWidget extends StatefulWidget {
   final VoidCallback onPlay;
   final VoidCallback onSubscribe;
   final VoidCallback onDeletePressed;
-  const VideoItemWidget(
-      {this.video, this.onPlay, this.onSubscribe, this.onDeletePressed});
+  final bool isSubscriptionBtnVisible;
+  const VideoItemWidget({
+    this.video,
+    this.onPlay,
+    this.onSubscribe,
+    this.onDeletePressed,
+    this.isSubscriptionBtnVisible: true,
+  });
 
   @override
   _VideoItemWidgetState createState() => _VideoItemWidgetState();
 }
 
 class _VideoItemWidgetState extends State<VideoItemWidget> {
-  bool _progress = false;
-  // var file = null;
   double width;
 
   @override
@@ -34,33 +38,31 @@ class _VideoItemWidgetState extends State<VideoItemWidget> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     // double height = MediaQuery.of(context).size.height;
-    return _progress
-        ? Center(child: CircularProgressIndicator())
-        : Container(
-            margin: EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: <Widget>[
-                //thumbnail
-                GestureDetector(
-                  child: CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    height: 200,
-                    width: width,
-                    imageUrl: widget.video.thumbNail,
-                    progressIndicatorBuilder:
-                        (context, url, downloadProgress) => Center(
-                      child: CircularProgressIndicator(
-                        value: downloadProgress.progress,
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+    return Container(
+        margin: EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: <Widget>[
+            //thumbnail
+            GestureDetector(
+              child: CachedNetworkImage(
+                fit: BoxFit.cover,
+                height: 200,
+                width: width,
+                imageUrl: widget.video.thumbNail,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    Center(
+                  child: CircularProgressIndicator(
+                    value: downloadProgress.progress,
                   ),
-                  onTap: widget.onPlay,
                 ),
-                //Row below thumbnail: include circular icon, videotitle and description
-                videoBottomView()
-              ],
-            ));
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+              onTap: widget.onPlay,
+            ),
+            //Row below thumbnail: include circular icon, videotitle and description
+            videoBottomView()
+          ],
+        ));
   }
 
   Widget videoBottomView() {
@@ -108,29 +110,31 @@ class _VideoItemWidgetState extends State<VideoItemWidget> {
                   ),
                 ),
               ),
-              isAdmin
-                  ? IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
-                      onPressed: widget.onDeletePressed)
-                  : SubscribeWidget(
-                      widget.video.sub,
-                      onClick: (status) async {
-                        // Response response = await Dio().post(
-                        //     "http://${Resources.BASE_URL}/subscribe/add",
-                        //     data: {
-                        //       "userID": Resources.userID,
-                        //       "ChannelID": widget.videoModel.channelID
-                        //     });
+              widget.isSubscriptionBtnVisible
+                  ? isAdmin
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: widget.onDeletePressed)
+                      : SubscribeWidget(
+                          widget.video.sub,
+                          onClick: (status) async {
+                            // Response response = await Dio().post(
+                            //     "http://${Resources.BASE_URL}/subscribe/add",
+                            //     data: {
+                            //       "userID": Resources.userID,
+                            //       "ChannelID": widget.videoModel.channelID
+                            //     });
 
-                        // setState(() {
-                        //   widget.videoModel.sub = status;
-                        //   widget.onSub();
-                        // });
-                      },
-                    ),
+                            // setState(() {
+                            //   widget.videoModel.sub = status;
+                            //   widget.onSub();
+                            // });
+                          },
+                        )
+                  : Container(width: 0, height: 0)
             ],
           ),
         ),
