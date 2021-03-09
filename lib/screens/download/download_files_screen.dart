@@ -29,15 +29,15 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
   @override
   void initState() {
     super.initState();
-    if (downloadingVideosList.length > 0) {
-      downloadingVideosList.forEach((videoModel) {
+    if (Constant.downloadingVideosList.length > 0) {
+      Constant.downloadingVideosList.forEach((videoModel) {
         isDownloaded(videoModel);
       });
     }
   }
 
   isDownloaded(VideoModel videoModel) async {
-//    var contain = Resources.listOfDownloadedFiles
+//    var contain = Resources.Constant.listOfDownloadedFiles
 //        .where((element) => element.mp4Url == videoModel.mp4URL);
 //    if (contain.isNotEmpty) downloaded = true;
 
@@ -52,7 +52,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
           '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
       File videoFile = new File(loc);
       if (videoFile.existsSync()) {
-        var contain = listOfDownloadedFiles
+        var contain = Constant.listOfDownloadedFiles
             .where((element) => element.mp4Url == videoModel.mp4URL);
         if (contain.isEmpty) {
           DatabaseHelper databaseHelper = DatabaseHelper();
@@ -100,7 +100,8 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) {
-              String filePath = listOfDownloadedFiles[index].fileLocation;
+              String filePath =
+                  Constant.listOfDownloadedFiles[index].fileLocation;
               file = File(filePath);
               String filename = basenameWithoutExtension(file.path);
               getThumbnail(index);
@@ -169,7 +170,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
                 ),
               );
             },
-            itemCount: listOfDownloadedFiles.length,
+            itemCount: Constant.listOfDownloadedFiles.length,
           )
         ],
       ),
@@ -178,7 +179,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
 
   Future<Uint8List> getThumbnail(int index) async {
     final uint8list = await VideoThumbnail.thumbnailData(
-      video: listOfDownloadedFiles[index].fileLocation,
+      video: Constant.listOfDownloadedFiles[index].fileLocation,
       imageFormat: ImageFormat.PNG,
       maxWidth: 140,
       // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
@@ -210,11 +211,12 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
 
               if (hasPermission) {
                 print("delete start");
-                print("path: " + listOfDownloadedFiles[fileIndex].fileLocation);
+                print("path: " +
+                    Constant.listOfDownloadedFiles[fileIndex].fileLocation);
 
                 // DatabaseHelper databaseHelper = DatabaseHelper();
                 //   int result = await databaseHelper.deleteFile(
-                //       id: Resources.listOfDownloadedFiles[fileIndex].id);
+                //       id: Resources.Constant.listOfDownloadedFiles[fileIndex].id);
 
                 //   if (result != 0) {
                 //     setState(() {
@@ -222,11 +224,12 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
                 //     });
                 //   }
 
-                file = File(listOfDownloadedFiles[fileIndex].fileLocation);
+                file = File(
+                    Constant.listOfDownloadedFiles[fileIndex].fileLocation);
                 file.delete().whenComplete(() async {
                   DatabaseHelper databaseHelper = DatabaseHelper();
                   int result = await databaseHelper.deleteFile(
-                      id: listOfDownloadedFiles[fileIndex].id);
+                      id: Constant.listOfDownloadedFiles[fileIndex].id);
                   print('result: ' + result.toString());
                   if (result != 0) {
                     updateDownloadedFilesList();
@@ -250,7 +253,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
       Future<List<DownloadedFile>> filesListFuture =
           databaseHelper.getDownloadedFilesList();
       filesListFuture.then((downloadedFileList) {
-        listOfDownloadedFiles = downloadedFileList;
+        Constant.listOfDownloadedFiles = downloadedFileList;
         setState(() {});
       });
     });
@@ -260,7 +263,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
 
   Future<void> shareFile(index) async {
     await Share.shareFiles(
-      [listOfDownloadedFiles[index].fileLocation],
+      [Constant.listOfDownloadedFiles[index].fileLocation],
       subject: 'Share Video',
       text: 'Share with friends',
     );

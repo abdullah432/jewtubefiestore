@@ -121,8 +121,8 @@ class CategoryPageState extends State<CategoryPage> {
                           child: Icon(
                             Icons.assignment,
                             color: selectedCategoryIndex == 0
-                                ? selectedColor
-                                : unselectedColor,
+                                ? Constant.selectedColor
+                                : Constant.unselectedColor,
                           ),
                         ),
                         SizedBox(
@@ -132,8 +132,8 @@ class CategoryPageState extends State<CategoryPage> {
                           child: Text("Daily Dose",
                               style: TextStyle(
                                 color: selectedCategoryIndex == 0
-                                    ? selectedColor
-                                    : unselectedColor,
+                                    ? Constant.selectedColor
+                                    : Constant.unselectedColor,
                                 fontWeight: FontWeight.w500,
                               )),
                         )
@@ -170,8 +170,8 @@ class CategoryPageState extends State<CategoryPage> {
                           child: Icon(
                             Icons.local_florist,
                             color: selectedCategoryIndex == 1
-                                ? selectedColor
-                                : unselectedColor,
+                                ? Constant.selectedColor
+                                : Constant.unselectedColor,
                           ),
                         ),
                         SizedBox(
@@ -181,8 +181,8 @@ class CategoryPageState extends State<CategoryPage> {
                           child: Text("Torah Classes",
                               style: TextStyle(
                                 color: selectedCategoryIndex == 1
-                                    ? selectedColor
-                                    : unselectedColor,
+                                    ? Constant.selectedColor
+                                    : Constant.unselectedColor,
                                 fontWeight: FontWeight.w500,
                               )),
                         )
@@ -221,8 +221,8 @@ class CategoryPageState extends State<CategoryPage> {
                         Icon(
                           Icons.movie_filter,
                           color: selectedCategoryIndex == 2
-                              ? selectedColor
-                              : unselectedColor,
+                              ? Constant.selectedColor
+                              : Constant.unselectedColor,
                         ),
                         SizedBox(
                           width: 7.0,
@@ -230,8 +230,8 @@ class CategoryPageState extends State<CategoryPage> {
                         Text("Movies",
                             style: TextStyle(
                               color: selectedCategoryIndex == 2
-                                  ? selectedColor
-                                  : unselectedColor,
+                                  ? Constant.selectedColor
+                                  : Constant.unselectedColor,
                               fontWeight: FontWeight.w500,
                             ))
                       ],
@@ -266,8 +266,8 @@ class CategoryPageState extends State<CategoryPage> {
                         Icon(
                           Icons.music_note,
                           color: selectedCategoryIndex == 3
-                              ? selectedColor
-                              : unselectedColor,
+                              ? Constant.selectedColor
+                              : Constant.unselectedColor,
                         ),
                         SizedBox(
                           width: 7.0,
@@ -275,8 +275,8 @@ class CategoryPageState extends State<CategoryPage> {
                         Text("Music",
                             style: TextStyle(
                               color: selectedCategoryIndex == 3
-                                  ? selectedColor
-                                  : unselectedColor,
+                                  ? Constant.selectedColor
+                                  : Constant.unselectedColor,
                               fontWeight: FontWeight.w500,
                             ))
                       ],

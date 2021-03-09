@@ -56,7 +56,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!init) {
         init = true;
-        if (isSignedIn) {
+        if (Constant.isSignedIn) {
           fetchVideos();
           setState(() {
             init = true;

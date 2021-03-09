@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/video.dart';
 
-final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+class Constant {
+  static bool isAdmin = false;
+  static bool isSignedIn = false;
 
-bool isAdmin = true;
-bool isSignedIn = true;
+  static List<DownloadedFile> listOfDownloadedFiles = [];
+  static List<VideoModel> downloadingVideosList = [];
 
-List<DownloadedFile> listOfDownloadedFiles = [];
-List<VideoModel> downloadingVideosList = [];
-
-final Color unselectedColor = Colors.grey[700];
-final Color selectedColor = Colors.red;
+  static final Color unselectedColor = Colors.grey[700];
+  static final Color selectedColor = Colors.red;
+}

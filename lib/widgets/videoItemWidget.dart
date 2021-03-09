@@ -111,7 +111,7 @@ class _VideoItemWidgetState extends State<VideoItemWidget> {
                 ),
               ),
               widget.isSubscriptionBtnVisible
-                  ? isAdmin
+                  ? Constant.isAdmin
                       ? IconButton(
                           icon: Icon(
                             Icons.delete,

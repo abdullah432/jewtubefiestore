@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:jewtubefirestore/model/user.dart';
+import 'package:jewtubefirestore/services/firebase_auth_service.dart';
+import 'package:jewtubefirestore/services/firestoreservice.dart';
+import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
+import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/responsive_ui.dart';
 import 'package:jewtubefirestore/utils/router/routing_names.dart';
 import 'local_widgets/custom_shape.dart';
 import 'local_widgets/customelevatedbtn.dart';
 import 'local_widgets/textformfield.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -14,9 +20,10 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _success;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   // String _userEmail;
 
@@ -37,9 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     return Material(
       child: Scaffold(
-        // appBar: CustomAppBar(
-        //   height: 90,
-        // ),
+        key: scaffoldKey,
         body: Container(
           height: _height,
           width: _width,
@@ -55,9 +60,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: _height / 35,
                 ),
                 CustomElevatedButton(
-                  onPressed: () {
-                    locator<NavigationService>()
-                        .navigateAndReplaceTo(MyBottomNavBarRoute);
+                  onPressed: () async {
+                    // locator<NavigationService>()
+                    //     .navigateAndReplaceTo(MyBottomNavBarRoute);
+                    if (_formKey.currentState.validate()) {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                      final database = context.read<FirestoreService>();
+                      var user = await context
+                          .read<FirebaseAuthService>()
+                          .createUserWithEmailAndPassword(
+                            _emailController.text.trim(),
+                            _passwordController.text.trim(),
+                          );
+                      if (user != null) {
+                        database.uid = user.uid;
+
+                        final currentUser = CurrentUser(
+                          name: _nameController.text.trim(),
+                          email: _emailController.text.trim(),
+                          isAdmin: false,
+                        );
+                        await database.createUser(user: currentUser);
+
+                        // Navigator.pop(context);
+                        locator<NavigationService>()
+                            .navigateAndReplaceTo(AuthRoute);
+                      }
+
+                      if (user == null) {
+                        Methods.showSnackbar(
+                          scafoldKey: scaffoldKey,
+                          message: context
+                              .read<FirebaseAuthService>()
+                              .userAuth
+                              .error,
+                        );
+                      }
+                    }
                   },
                   title: 'SIGN UP',
                   width: _large
@@ -84,12 +123,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
         key: _formKey,
         child: Column(
           children: <Widget>[
+            nameTextFormField(),
+            SizedBox(height: _height / 60.0),
             emailTextFormField(),
             SizedBox(height: _height / 60.0),
             passwordTextFormField(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget nameTextFormField() {
+    return CustomTextField(
+      textEditingController: _nameController,
+      keyboardType: TextInputType.name,
+      icon: Icons.account_box,
+      hint: "Name",
     );
   }
 
@@ -217,14 +267,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         //back button
         Positioned(
-            top: 50,
-            left: 20,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(Icons.arrow_back),
-            )),
+          top: 50,
+          left: 20,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back),
+          ),
+        ),
       ],
     );
   }

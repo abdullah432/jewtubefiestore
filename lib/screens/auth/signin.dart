@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/screens/auth/local_widgets/welcomtext.dart';
 import 'package:jewtubefirestore/screens/bottomnavbar/bottomnavigationbar.dart';
+import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/responsive_ui.dart';
@@ -58,9 +59,13 @@ class _SignInScreenState extends State<SignInScreen> {
               emailAndPasswordForms(),
               SizedBox(height: 12.0),
               CustomElevatedButton(
-                onPressed: () {
-                  locator<NavigationService>()
-                      .navigateAndReplaceTo(MyBottomNavBarRoute);
+                onPressed: () async {
+                  final authService = FirebaseAuthService();
+                  await authService.signInWithEmailAndPassword(
+                    emailController.text.trim(),
+                    passwordController.text.trim(),
+                  );
+                  locator<NavigationService>().navigateAndReplaceTo(AuthRoute);
                 },
                 title: 'LOGIN',
                 width: _large
@@ -122,6 +127,17 @@ class _SignInScreenState extends State<SignInScreen> {
             'assets/logo.png',
             height: _height / 3.5,
             width: _width / 3.5,
+          ),
+        ),
+        //back button
+        Positioned(
+          top: 50,
+          left: 20,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back),
           ),
         ),
       ],

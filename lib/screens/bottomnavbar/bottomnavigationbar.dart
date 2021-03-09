@@ -8,10 +8,13 @@ import 'package:jewtubefirestore/screens/category/category_page.dart';
 import 'package:jewtubefirestore/screens/download/download_files_screen.dart';
 import 'package:jewtubefirestore/screens/home/home.dart';
 import 'package:jewtubefirestore/screens/subscription/subscriptionpage.dart';
+import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
+import 'package:jewtubefirestore/utils/dumydata.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/router/routing_names.dart';
+import 'package:jewtubefirestore/widgets/newchanneldialog.dart';
 import 'local_widgets/bottonnavbarwidget.dart';
 
 class MyBottomNavBarPage extends StatefulWidget {
@@ -27,12 +30,14 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
   final PageStorageBucket bucket = PageStorageBucket();
   int _selectedIndex;
   _MyBottomNavBarPageState(this._selectedIndex);
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   // bool _isConfigured = false;
 
   //appbar
   bool isSearchViewClicked = false;
   //channel list
-  List<Channel> _channelList = [];
+  List<Channel> _channelList = DumyData.channelList;
 
   @override
   void initState() {
@@ -46,6 +51,14 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
       key: scaffoldKey,
       drawer: MyDrawer(
         channelList: _channelList,
+        onAddChannelClick: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return CreateNewChannelDialogBox();
+            },
+          );
+        },
       ),
       appBar: appBar(),
       bottomNavigationBar: BottomNavBarWidget(
@@ -55,6 +68,14 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
       body: PageStorage(
         child: getPage(_selectedIndex),
         bucket: bucket,
+      ),
+      floatingActionButton: Visibility(
+        visible: Constant.isAdmin,
+        child: FloatingActionButton(
+          backgroundColor: Theme.of(context).primaryColor,
+          onPressed: () {},
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -79,6 +100,7 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
   }
 
   appBar() {
+    print('From appbar: ' + Constant.isSignedIn.toString());
     return AppBar(
       iconTheme: IconThemeData(color: Colors.white),
       backgroundColor: Colors.red,
@@ -134,14 +156,14 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
                 ),
               ],
             ),
-      leading: isAdmin
+      leading: Constant.isAdmin
           ? IconButton(
               icon: Icon(FlutterIcons.bars_faw),
               onPressed: () {
                 scaffoldKey.currentState.openDrawer();
               },
             )
-          : null,
+          : Container(width: 0),
       actions: actionWidgetList(),
     );
   }
@@ -171,20 +193,24 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
         },
       ),
       //if user is not sigin then show this icon
-      isSignedIn
+      Constant.isSignedIn
           ? IconButton(
-              icon: Icon(FlutterIcons.user_faw),
-              onPressed: () async {
-                locator<NavigationService>().navigateAndReplaceTo(LoginRoute);
-              })
-          : IconButton(
               icon: Icon(FlutterIcons.sign_out_alt_faw5s),
               onPressed: () async {
-                // SharedPreferences prefs =
-                //     await SharedPreferences.getInstance();
-                // prefs?.clear();
-                locator<NavigationService>().navigateAndReplaceTo(LoginRoute);
-              })
+                final authService = FirebaseAuthService();
+                await authService.signOut();
+                print('signout');
+                await locator<NavigationService>().navigateTo(LoginRoute);
+                setState(() {});
+              },
+            )
+          : IconButton(
+              icon: Icon(FlutterIcons.user_faw),
+              onPressed: () async {
+                await locator<NavigationService>().navigateTo(LoginRoute);
+                setState(() {});
+              },
+            )
     ];
   }
 }

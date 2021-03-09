@@ -1,13 +1,27 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
 class Channel {
   Channel({
-    @required this.channelID,
     @required this.channelName,
-    @required this.imgUrl,
+    this.profileurl,
   });
 
-  final String channelID;
-  final String channelName;
-  final String imgUrl;
+  String channelName;
+  String profileurl;
+  DocumentReference reference;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'channelname': channelName,
+      'profileurl': profileurl,
+    };
+  }
+
+  Channel.fromMap(Map<String, dynamic> map, {this.reference})
+      : channelName = map['channelname'],
+        profileurl = map['profileurl'];
+
+  Channel.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data(), reference: snapshot.reference);
 }

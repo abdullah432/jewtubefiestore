@@ -23,7 +23,7 @@ class ChannelListView extends StatelessWidget {
             shrinkWrap: true,
             itemBuilder: (context, index) {
               return GestureDetector(
-                onTap: () => onChannelClick(channelList[index].channelID),
+                onTap: () => onChannelClick(channelList[index].reference.id),
                 // () async {
                 // final dio=await Dio().get("http://${Resources.BASE_URL}/video/getvideos/ByChannel/${_channelList[index].channelID}");
                 // print(dio.data);
@@ -54,11 +54,11 @@ class ChannelListView extends StatelessWidget {
                   padding: const EdgeInsets.all(10.0),
                   child: CircleAvatar(
                     radius: 30.0,
-                    backgroundImage: channelList[index].imgUrl == "" ||
-                            channelList[index].imgUrl == null
+                    backgroundImage: channelList[index].profileurl == "" ||
+                            channelList[index].profileurl == null
                         ? AssetImage("assets/no_img.png")
                         : CachedNetworkImageProvider(
-                            channelList[index].imgUrl,
+                            channelList[index].profileurl,
                           ),
                   ),
                 ),

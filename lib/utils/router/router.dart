@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jewtubefirestore/screens/auth/auth_widget.dart';
 import 'package:jewtubefirestore/screens/auth/signin.dart';
 import 'package:jewtubefirestore/screens/auth/signup.dart';
 import 'package:jewtubefirestore/screens/bottomnavbar/bottomnavigationbar.dart';
@@ -14,12 +15,15 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _getPageRoute(SignInPage(), settings);
     case SignupRoute:
       return _getPageRoute(SignUpScreen(), settings);
+    case AuthRoute:
+      return _getPageRoute(AuthWidget(), settings);
     case MyBottomNavBarRoute:
       return _getPageRoute(
-          MyBottomNavBarPage(
-            selectedIndex: settings?.arguments ?? 0,
-          ),
-          settings);
+        MyBottomNavBarPage(
+          selectedIndex: settings?.arguments ?? 0,
+        ),
+        settings,
+      );
 
     default:
       return _getPageRoute(SignInPage(), settings);
