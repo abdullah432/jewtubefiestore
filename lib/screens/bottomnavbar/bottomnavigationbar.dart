@@ -1,8 +1,5 @@
-import 'dart:io';
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:jewtubefirestore/model/channel.dart';
 import 'package:jewtubefirestore/screens/bottomnavbar/local_widgets/drawerwidget.dart';
 import 'package:jewtubefirestore/screens/category/category_page.dart';
 import 'package:jewtubefirestore/screens/download/download_files_screen.dart';
@@ -10,7 +7,6 @@ import 'package:jewtubefirestore/screens/home/home.dart';
 import 'package:jewtubefirestore/screens/subscription/subscriptionpage.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
-import 'package:jewtubefirestore/utils/dumydata.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/router/routing_names.dart';
@@ -19,7 +15,7 @@ import 'local_widgets/bottonnavbarwidget.dart';
 
 class MyBottomNavBarPage extends StatefulWidget {
   final selectedIndex;
-  MyBottomNavBarPage({this.selectedIndex: 1, Key key}) : super(key: key);
+  MyBottomNavBarPage({this.selectedIndex: 0, Key key}) : super(key: key);
 
   @override
   _MyBottomNavBarPageState createState() =>
@@ -36,8 +32,6 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
 
   //appbar
   bool isSearchViewClicked = false;
-  //channel list
-  List<Channel> _channelList = DumyData.channelList;
 
   @override
   void initState() {
@@ -50,7 +44,6 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
       // backgroundColor: Colors.transparent,
       key: scaffoldKey,
       drawer: MyDrawer(
-        channelList: _channelList,
         onAddChannelClick: () {
           showDialog(
             context: context,

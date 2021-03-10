@@ -15,7 +15,7 @@ class Methods {
   }
 
   static Future<void> chooseFileFromGallery(BuildContext context,
-      {FileType fileType: FileType.any}) async {
+      {FileType fileType: FileType.image}) async {
     try {
       final imagePicker =
           Provider.of<FilePickerService>(context, listen: false);

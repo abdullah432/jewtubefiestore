@@ -6,8 +6,10 @@ import 'package:jewtubefirestore/utils/dumydata.dart';
 
 class ChannelListView extends StatelessWidget {
   final List<Channel> channellist;
+  final Function(Channel) onDelete;
   const ChannelListView({
     @required this.channellist,
+    @required this.onDelete,
     Key key,
   }) : super(key: key);
 
@@ -29,11 +31,7 @@ class ChannelListView extends StatelessWidget {
                 Icons.delete,
                 color: Colors.red,
               ),
-              onPressed: () {
-                // deleteChannel(channel.channelID).whenComplete(() {
-                //   getAllChannels();
-                // });
-              },
+              onPressed: () => onDelete(channel),
             ),
             title: Text(channel.channelName),
             onTap: () {

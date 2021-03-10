@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/channel.dart';
+import 'package:jewtubefirestore/services/channelservice.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
-import 'package:jewtubefirestore/services/firestoreservice.dart';
 import 'package:jewtubefirestore/utils/methods.dart';
+import 'package:jewtubefirestore/widgets/circularbutton.dart';
 import 'package:provider/provider.dart';
 
 import 'myavatar.dart';
@@ -22,13 +23,17 @@ class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
   final channelNameController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+    return SingleChildScrollView(
+      child: Center(
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          // elevation: 0,
+          // backgroundColor: Colors.transparent,
+          child: contentBox(context),
+        ),
       ),
-      // elevation: 0,
-      // backgroundColor: Colors.transparent,
-      child: contentBox(context),
     );
   }
 
@@ -50,6 +55,8 @@ class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
           Consumer<FilePickerService>(
             builder: (context, filepicker, child) {
               profileImageFile = filepicker.pickedFile.file;
+              // print('path:' + profileImageFile?.path);
+
               return MyAvatar(
                 file: filepicker.pickedFile.file,
                 onTap: () => Methods.chooseFileFromGallery(context,
@@ -75,35 +82,39 @@ class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
           Padding(
             padding: const EdgeInsets.only(left: 10.0, right: 10.0),
             child: Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               mainAxisSize: MainAxisSize.min,
               children: [
                 //
-                Expanded(
+                Container(
+                  width: 110.0,
                   child: TextButton(
-                    onPressed: () {
-                      final database = Provider.of<FirestoreService>(context);
-                      database.createChannel(
+                    onPressed: () async {
+                      final channelService =
+                          Provider.of<ChannelService>(context, listen: false);
+                      await channelService.createChannel(
+                        context,
                         channel: Channel(
                             channelName: channelNameController.text.trim()),
                         imagefile: profileImageFile,
                       );
+                      Navigator.pop(context);
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.green,
                     ),
-                    child: Expanded(
-                      child: Text(
-                        'ADD',
-                        style: TextStyle(color: Colors.white, fontSize: 18.0),
-                      ),
+                    child: Text(
+                      'ADD',
+                      style: TextStyle(color: Colors.white, fontSize: 18.0),
                     ),
                   ),
                 ),
                 //
-                SizedBox(width: 10.0),
+                SizedBox(width: 15.0),
+
                 //
-                Expanded(
+                Container(
+                  width: 110.0,
                   child: TextButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -111,18 +122,15 @@ class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.green,
                     ),
-                    child: Expanded(
-                      child: Text(
-                        'CANCEL',
-                        style: TextStyle(color: Colors.white, fontSize: 18.0),
-                      ),
+                    child: Text(
+                      'CANCEL',
+                      style: TextStyle(color: Colors.white, fontSize: 18.0),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 10.0),
         ],
       ),
     );

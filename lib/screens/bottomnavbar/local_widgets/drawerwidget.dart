@@ -1,18 +1,17 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:jewtubefirestore/model/user.dart';
+import 'package:jewtubefirestore/services/channelservice.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
+import 'package:jewtubefirestore/widgets/CustomAlertDialog.dart';
 import 'package:provider/provider.dart';
 
 import 'mychannellisttile.dart';
 
 class MyDrawer extends StatelessWidget {
   final dividerColor = Colors.grey;
-  final channelList;
   final VoidCallback onAddChannelClick;
   const MyDrawer({
-    @required this.channelList,
     @required this.onAddChannelClick,
     Key key,
   }) : super(key: key);
@@ -64,15 +63,39 @@ class MyDrawer extends StatelessWidget {
                 thickness: 5,
                 color: dividerColor,
               ),
-              channelList.length > 0
-                  ? Container()
-                  : Container(
+              Consumer<ChannelService>(
+                builder: (context, service, child) {
+                  if (service.channelsList == null) {
+                    service.loadChannelList();
+                    return Center(child: CircularProgressIndicator());
+                  } else if (service.channelsList.length == 0) {
+                    return Container(
                       child: Center(
                         child: Text("No Channel To View"),
                       ),
-                    ),
-              ChannelListView(
-                channellist: channelList,
+                    );
+                  } else
+                    return ChannelListView(
+                      channellist: service.channelsList,
+                      onDelete: (channel) {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return CustomAlertDialog(
+                                  onConfirmClick: () async {
+                                final channelService =
+                                    Provider.of<ChannelService>(context,
+                                        listen: false);
+                                await channelService.deleteChannel(channel);
+                                Navigator.pop(context);
+                              });
+                            });
+                        // final channelservice =
+                        //     Provider.of<ChannelService>(context, listen: false);
+                        // channelservice.deleteChannel(channel);
+                      },
+                    );
+                },
               ),
               Divider(
                 thickness: 2,

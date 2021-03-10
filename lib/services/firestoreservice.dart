@@ -45,29 +45,14 @@ class FirestoreService with ChangeNotifier {
     return;
   }
 
-  Future<void> createChannel(
-    context, {
+  Future<DocumentReference> createChannel({
     @required Channel channel,
-    File imagefile,
   }) async {
     jobStarted();
-
-    String downloadUrl;
-    if (imagefile != null) {
-      //Upload to storage
-      final storage =
-          Provider.of<FirebaseStorageService>(context, listen: false);
-      downloadUrl = await storage.uploadAvatar(
-        channelname: channel.channelName,
-        file: imagefile,
-      );
-    }
-
-    if (downloadUrl != null) channel.profileurl = downloadUrl;
-
-    await db.collection("channels").doc().set(channel.toMap());
+    final ref = db.collection("channels").doc();
+    await ref.set(channel.toMap());
     jobEnded();
-    return;
+    return ref;
   }
 
   // Future<void> createPost({@required Post post}) async {
@@ -106,6 +91,33 @@ class FirestoreService with ChangeNotifier {
       print(e.toString());
       return null;
     }
+  }
+
+  Future<List<Channel>> loadChannelList({useruid}) async {
+    try {
+      final authService = FirebaseAuthService();
+
+      if (authService.isUserLoggedIn()) {
+        var snapshot = await db.collection('channels').get();
+        List<Channel> channelsList = snapshot.docs
+            .map((snapshot) => Channel.fromSnapshot(snapshot))
+            .toList();
+
+        return channelsList;
+      } else {
+        print('isUserLoggedIn: false');
+        return [];
+      }
+    } catch (e) {
+      print('error');
+      print(e.toString());
+      return [];
+    }
+  }
+
+  deleteChannel(channeluid) async {
+    await db.collection('channels').doc(channeluid).delete();
+    return;
   }
 
   Future<List<CurrentUser>> searchUser({
