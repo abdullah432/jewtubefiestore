@@ -64,7 +64,7 @@ class FirestoreService with ChangeNotifier {
   //   db.collection("posts").doc(postid).delete();
   // }
 
-  Future<CurrentUser> loadUserData({useruid}) async {
+  Future<CurrentUser> loadUserData(context, {useruid}) async {
     print('load user data');
     try {
       final authService = FirebaseAuthService();
@@ -77,6 +77,8 @@ class FirestoreService with ChangeNotifier {
         var snapshot = await db.collection('users').doc(loggeduser.uid).get();
         print('fetched');
         final user = CurrentUser.fromSnapshot(snapshot);
+        final currentUser = Provider.of<CurrentUser>(context, listen: false);
+        currentUser.updateCurrentUserData(user);
         Constant.isSignedIn = true;
         Constant.isAdmin = user.isAdmin;
         print('Constant.isSignedIn: ' + Constant.isSignedIn.toString());

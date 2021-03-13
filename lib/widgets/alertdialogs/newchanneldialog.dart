@@ -5,10 +5,8 @@ import 'package:jewtubefirestore/model/channel.dart';
 import 'package:jewtubefirestore/services/channelservice.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
 import 'package:jewtubefirestore/utils/methods.dart';
-import 'package:jewtubefirestore/widgets/circularbutton.dart';
 import 'package:provider/provider.dart';
-
-import 'myavatar.dart';
+import '../myavatar.dart';
 
 class CreateNewChannelDialogBox extends StatefulWidget {
   const CreateNewChannelDialogBox({Key key}) : super(key: key);

@@ -25,6 +25,8 @@ dependencies:
     sdk: flutter
   flutter_downloader: ^1.5.2
   flutter_icons: ^1.1.0
+  fluttertoast: ^8.0.1-nullsafety.0
+  liquid_progress_indicator: ^0.3.2
   get_it: ^6.0.0
   cached_network_image: ^3.0.0-nullsafety
   file_picker: ^3.0.0

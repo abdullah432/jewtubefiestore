@@ -12,14 +12,13 @@ class AuthWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     print('AuthWidget');
     final service = Provider.of<FirestoreService>(context, listen: false);
-    final currentUser = Provider.of<CurrentUser>(context, listen: false);
     return FutureBuilder(
-      future: service.loadUserData(),
+      future: service.loadUserData(context),
       builder: (_, AsyncSnapshot<CurrentUser> snap) {
-        if (snap.hasData) {
+        if (snap.connectionState == ConnectionState.done) {
           print('hasData: true');
 
-          currentUser.updateCurrentUserData(snap.data);
+          // currentUser.updateCurrentUserData(snap.data);
           SchedulerBinding.instance.addPostFrameCallback((_) {
             locator<NavigationService>()
                 .navigateAndReplaceTo(MyBottomNavBarRoute);

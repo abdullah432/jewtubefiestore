@@ -8,9 +8,11 @@ import 'package:jewtubefirestore/screens/subscription/subscriptionpage.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
+import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/router/routing_names.dart';
-import 'package:jewtubefirestore/widgets/newchanneldialog.dart';
+import 'package:jewtubefirestore/widgets/alertdialogs/newchanneldialog.dart';
+import 'package:jewtubefirestore/widgets/alertdialogs/selectchanneldialog.dart';
 import 'local_widgets/bottonnavbarwidget.dart';
 
 class MyBottomNavBarPage extends StatefulWidget {
@@ -66,7 +68,16 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
         visible: Constant.isAdmin,
         child: FloatingActionButton(
           backgroundColor: Theme.of(context).primaryColor,
-          onPressed: () {},
+          onPressed: () {
+            Methods.showAlertDialog(
+              context: context,
+              dialog: SelectChannelDialogBox(
+                onChannelSelection: (channel) {
+                  locator<NavigationService>().navigateTo(AddVideoScreenRoute);
+                },
+              ),
+            );
+          },
           child: Icon(Icons.add),
         ),
       ),

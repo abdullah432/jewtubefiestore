@@ -61,11 +61,13 @@ class _SignInScreenState extends State<SignInScreen> {
               CustomElevatedButton(
                 onPressed: () async {
                   final authService = FirebaseAuthService();
-                  await authService.signInWithEmailAndPassword(
+                  bool result = await authService.signInWithEmailAndPassword(
                     emailController.text.trim(),
                     passwordController.text.trim(),
                   );
-                  locator<NavigationService>().navigateAndReplaceTo(AuthRoute);
+                  if (result)
+                    locator<NavigationService>()
+                        .navigateAndReplaceTo(AuthRoute);
                 },
                 title: 'LOGIN',
                 width: _large

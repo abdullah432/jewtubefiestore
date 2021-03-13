@@ -8,6 +8,7 @@ import 'package:jewtubefirestore/services/file_picker_service.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Methods {
   static showSnackbar({@required scafoldKey, @required message}) {
@@ -61,5 +62,22 @@ class Methods {
       });
       return;
     });
+  }
+
+  static showAlertDialog({@required context, @required dialog}) {
+    showDialog(
+      context: context,
+      builder: (context) => dialog,
+    );
+  }
+
+  static showToast({@required String message}) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }

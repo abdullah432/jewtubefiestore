@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jewtubefirestore/screens/adminscreens/addvideo/addvideoscreen.dart';
 import 'package:jewtubefirestore/screens/auth/auth_widget.dart';
 import 'package:jewtubefirestore/screens/auth/signin.dart';
 import 'package:jewtubefirestore/screens/auth/signup.dart';
@@ -24,7 +25,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
         settings,
       );
-
+    case AddVideoScreenRoute:
+      return _getPageRoute(AddVideoScreen(), settings);
     default:
       return _getPageRoute(SignInPage(), settings);
   }

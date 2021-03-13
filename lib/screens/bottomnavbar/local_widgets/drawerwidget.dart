@@ -3,7 +3,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:jewtubefirestore/model/user.dart';
 import 'package:jewtubefirestore/services/channelservice.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
-import 'package:jewtubefirestore/widgets/CustomAlertDialog.dart';
+import 'package:jewtubefirestore/widgets/alertdialogs/CustomAlertDialog.dart';
 import 'package:provider/provider.dart';
 
 import 'mychannellisttile.dart';
