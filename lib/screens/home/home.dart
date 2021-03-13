@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/video.dart';
+import 'package:jewtubefirestore/screens/videoplayer/videoPlay.dart';
 import 'package:jewtubefirestore/utils/dumydata.dart';
 import '../../widgets/videoItemWidget.dart';
 
@@ -36,11 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: VideoItemWidget(
                         video: _videoList[index],
                         onPlay: () {
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (builder) => VideoPlayerScreen(
-                          //             videoModel: _videoList[index])));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (builder) => VideoPlayerScreen(
+                                      videoModel: _videoList[index])));
                         },
                         onSubscribe: () {
                           //add subscription to channel

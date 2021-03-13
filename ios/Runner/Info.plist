@@ -48,5 +48,10 @@
 		</array>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Please allow picking video from storage</string>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
 	</dict>
 </plist>

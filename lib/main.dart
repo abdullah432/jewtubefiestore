@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:jewtubefirestore/screens/auth/auth_widget.dart';
 import 'package:jewtubefirestore/screens/bottomnavbar/bottomnavigationbar.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
@@ -17,9 +18,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  // await FlutterDownloader.initialize(
-  //     debug: true // optional: set false to disable printing logs to console
-  //     );
+  await FlutterDownloader.initialize(
+      debug: true // optional: set false to disable printing logs to console
+      );
   //start loading list of downloaded files
   //function is written in 'package:jewtube/util/utils.dart'
   // loadDownloadedFilesList();

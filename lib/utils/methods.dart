@@ -4,9 +4,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/sqflite_helper.dart';
+import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -79,5 +81,9 @@ class Methods {
         backgroundColor: Colors.red,
         textColor: Colors.white,
         fontSize: 16.0);
+  }
+
+  static shareLink({@required VideoModel video}) {
+    Share.share(video.videoTitle);
   }
 }
