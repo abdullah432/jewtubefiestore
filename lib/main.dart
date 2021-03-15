@@ -6,6 +6,7 @@ import 'package:jewtubefirestore/screens/bottomnavbar/bottomnavigationbar.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/services/firestoreservice.dart';
+import 'package:jewtubefirestore/services/videosService.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/router/router.dart';
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<ChannelService>(create: (_) => ChannelService()),
         ChangeNotifierProvider<FilePickerService>(
             create: (_) => FilePickerService()),
+        ChangeNotifierProvider<VideosService>(create: (_) => VideosService()),
       ],
       child: MaterialApp(
         title: 'JewTube',

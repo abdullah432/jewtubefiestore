@@ -2,21 +2,26 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:jewtubefirestore/model/channel.dart';
+import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
+import 'package:jewtubefirestore/services/videosService.dart';
 import 'package:jewtubefirestore/utils/methods.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as Path;
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
+import 'package:aws_s3_upload/aws_s3_upload.dart';
 
 class AddVideoScreen extends StatefulWidget {
-  // AddVideoScreen(
-  //   this.channelID,
-  // );
+  AddVideoScreen(
+    this.channel,
+  );
 
-  // final String channelID;
+  final Channel channel;
 
   @override
   _AddVideoScreenState createState() => _AddVideoScreenState();
@@ -25,7 +30,7 @@ class AddVideoScreen extends StatefulWidget {
 class _AddVideoScreenState extends State<AddVideoScreen> {
   double _progressValue = 0;
   FocusNode _focusNode = new FocusNode();
-  bool _isUploading = false;
+  bool isFileUploading = false;
   bool _titleEditEnable = true;
   TextEditingController _txtTitle = TextEditingController();
   bool init = false;
@@ -38,9 +43,12 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
     'Music',
     'Movies'
   ];
+
   String selectedCategory;
 
   void uploadVideo(BuildContext context) async {
+    String result;
+
     if (videofile == null) {
       Methods.showToast(message: "No Video Selected");
     } else if (_txtTitle.text == null || _txtTitle.text == "") {
@@ -48,70 +56,65 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
     } else if (selectedCategory == null) {
       Methods.showToast(message: "Please select category");
     } else {
-//       var uuid = Uuid().v4();
-//       if (file != null) {
-//         Dio dio = new Dio();
-//         var filename = "jewtube-_-_-$uuid-_-_-" +
-//             (basename(file.path).replaceAll("trim.", ""));
-//         setState(() {
-//           _titleEditEnable = false;
-//           _isUploading = true;
-//         });
-//         var response;
-//         if (thumbFile != null) {
-//           var thumbName = "thumb_image-" + uuid + (basename(thumbFile.path));
-//           response =
-//               await dio.post("http://${Resources.BASE_URL}/video/addVideo",
-//                   data: FormData.fromMap({
-//                     "file": MultipartFile.fromFileSync(file.path),
-//                     "thumb_image": thumbFile.readAsBytesSync(),
-//                     "thumb_name": thumbName,
-//                     "name": filename,
-//                     "title": _txtTitle.text,
-//                     "videoID": uuid,
-//                     "category": selectedCategory,
-//                     "channel": widget.channelID
-//                   }), onSendProgress: (int sent, int total) {
-//             setState(() {
-//               _progressValue = (sent * 100) / total;
-//             });
-//           });
-//         } else {
-//           response =
-//               await dio.post("http://${Resources.BASE_URL}/video/addVideo",
-//                   data: FormData.fromMap({
-//                     "file": MultipartFile.fromFileSync(file.path),
-//                     "name": filename,
-//                     "title": _txtTitle.text,
-//                     "videoID": uuid,
-//                     "category": selectedCategory,
-//                     "channel": widget.channelID
-//                   }), onSendProgress: (int sent, int total) {
-//             setState(() {
-//               _progressValue = (sent * 100) / total;
-//             });
-//           });
-//         }
-//         print(response.data);
-//         setState(() {
-//           _isUploading = false;
-//         });
-//         if (response != null &&
-//             response.data != null &&
-//             response.data['status'] == 200 &&
-//             response.data['vid'] != null) {
-//           await Dio().post("http://${Resources.BASE_URL}/adminvideo", data: {
-//             "title": _txtTitle.text,
-//             "videoID": response.data['vid'],
-//           });
-//           showToast(message: "Upload Completed");
-// //           Navigator.of(context).pushReplacementNamed(HOME);
-//         } else {
-//           showToast(message: "Upload Error");
-//         }
-//       } else {
-//         showToast(message: "No Video Selected");
-//       }
+      setState(() => isFileUploading = true);
+
+      Channel channel = widget.channel;
+      VideoModel video = VideoModel(
+        channelID: channel.reference.id,
+        channelName: channel.channelName,
+        channelImage: channel.profileurl,
+        videoTitle: _txtTitle.text.trim(),
+        videoURL: null,
+        mp4URL: null,
+        thumbNail: null,
+        isVideoProcessingComplete: false,
+        category: selectedCategory,
+      );
+
+      final videoservice = Provider.of<VideosService>(context, listen: false);
+      await videoservice.uploadVideo(context, video, thumbFile, videofile);
+      // setState(() => isFileUploading = false);
+
+      try {
+        String result = await AwsS3.uploadFile(
+          accessKey: "AKIAWCKQN7QY2ST4V4U3",
+          secretKey: "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",
+          file: File(videofile.path),
+          filename: Path.basename(videofile.path).toString(),
+          bucket: "jewtube-source-14c5ef0ws4cpc",
+          region: "us-west-2",
+          destDir: videofile.path,
+        );
+        print('result: ' + result);
+        print('success');
+      } catch (e) {
+        print('uploading fialed');
+        print(e.toString());
+      }
+      setState(() => isFileUploading = false);
+      Navigator.pop(context);
+      // print(Path.basename(videofile.path).toString());
+      // AwsS3 awsS3 = AwsS3(
+      //   awsFolderPath: "TestingFromFirestore",
+      //   file: videofile,
+      //   fileNameWithExt: Path.basename(videofile.path),
+      //   region: Regions.US_WEST_2,
+      //   bucketName: 'jewtube-source-14c5ef0ws4cpc',
+      //   poolId: '',
+      // );
+
+      // setState(() => isFileUploading = true);
+
+      // try {
+      //   try {
+      //     result = await awsS3.uploadFile;
+      //     debugPrint("Result :'$result'.");
+      //   } on PlatformException {
+      //     debugPrint("Result :'$result'.");
+      //   }
+      // } on PlatformException catch (e) {
+      //   debugPrint("Failed :'${e.message}'.");
+      // }
     }
   }
 
@@ -127,13 +130,13 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
           backgroundColor: Colors.red,
         ),
         resizeToAvoidBottomInset: false,
-        body: _isUploading
+        body: isFileUploading
             ? Center(
                 child: Column(
                   children: <Widget>[
                     SizedBox(height: 20),
                     Text(
-                      "${_progressValue.toStringAsFixed(1)}% Uploading...\nPlease wait it can take some time",
+                      "Uploading...\nPlease wait it can take some time",
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 20),
@@ -147,18 +150,21 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                   child: Column(
                     children: <Widget>[
                       TextField(
-                          focusNode: _focusNode,
-                          enabled: _titleEditEnable,
-                          controller: _txtTitle,
-                          cursorColor: Colors.red,
-                          decoration: InputDecoration(
-                              labelText: "TITLE",
-                              labelStyle: TextStyle(
-                                  color: _focusNode.hasFocus
-                                      ? Colors.red
-                                      : Colors.black38),
-                              focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.red)))),
+                        focusNode: _focusNode,
+                        enabled: _titleEditEnable,
+                        controller: _txtTitle,
+                        cursorColor: Colors.red,
+                        decoration: InputDecoration(
+                          labelText: "TITLE",
+                          labelStyle: TextStyle(
+                              color: _focusNode.hasFocus
+                                  ? Colors.red
+                                  : Colors.black38),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                          ),
+                        ),
+                      ),
                       SizedBox(
                         height: 20,
                       ),
@@ -241,8 +247,13 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                                   child: Material(
                                     color: Colors.transparent,
                                     child: InkWell(
-                                      onTap: () => filepickerservice.pickFile(
-                                          fileType: FileType.image),
+                                      onTap: () async {
+                                        bool result = await filepickerservice
+                                            .pickFile(fileType: FileType.image);
+                                        if (result)
+                                          thumbFile = filepickerservice
+                                              .customthumbnailFile;
+                                      },
                                       child: filepickerservice
                                                   .customthumbnailFile ==
                                               null

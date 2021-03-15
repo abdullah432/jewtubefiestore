@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jewtubefirestore/model/channel.dart';
 import 'package:jewtubefirestore/model/user.dart';
+import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -55,14 +56,14 @@ class FirestoreService with ChangeNotifier {
     return ref;
   }
 
-  // Future<void> createPost({@required Post post}) async {
-  //   await db.collection("posts").doc().set(post.toMap());
-  //   return;
-  // }
-
-  // deletePost({@required String postid}) {
-  //   db.collection("posts").doc(postid).delete();
-  // }
+  Future<List<VideoModel>> loadAllVideos() async {
+    final ref = db.collection("videos");
+    var snapshot = await ref.get();
+    final List<VideoModel> videolist = snapshot.docs
+        .map((snapshot) => VideoModel.fromSnapshot(snapshot))
+        .toList();
+    return videolist;
+  }
 
   Future<CurrentUser> loadUserData(context, {useruid}) async {
     print('load user data');
@@ -115,6 +116,12 @@ class FirestoreService with ChangeNotifier {
       print(e.toString());
       return [];
     }
+  }
+
+  Future<bool> uploadVideo(VideoModel video) async {
+    final ref = db.collection("videos").doc();
+    await ref.set(video.toMap());
+    return true;
   }
 
   deleteChannel(channeluid) async {

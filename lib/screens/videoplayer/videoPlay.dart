@@ -1,15 +1,20 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:jewtubefirestore/model/downloaded_files.dart';
+import 'package:jewtubefirestore/model/sqflite_helper.dart';
 import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/screens/home/local_widgets/subscribewidget.dart';
+import 'package:jewtubefirestore/services/videosService.dart';
+import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:jewtubefirestore/utils/methods.dart';
+import 'package:jewtubefirestore/widgets/videoItemWidget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
@@ -28,7 +33,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   //       "https://d3ofruocozqolb.cloudfront.net/9b928440-9d6c-43a4-9150-1d10705c4d2a/hls/jewtube-_-_-a1fb300d-84b6-4c07-bc8d-9ad7eeced748-_-_-TalkingTom2(9).m3u8");
   VideoModel videoModel;
   List<VideoModel> _videoList = [];
-  bool _progress = true;
+  bool recomendedVideosList = true;
   bool init = false;
 
   _VideoPlayerScreenState(this.videoModel);
@@ -68,14 +73,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         .animate(_animationController);
     //
     initVideoPlayer();
-    // _chewieController = ChewieController(
-    //   // videoPlayerController: VideoPlayerController.network(videoModel.videoURL)..initialize(),
-    //   videoPlayerController: _videoPlayerController,
-    //   autoPlay: true,
-    //   looping: true,
-    //   aspectRatio: 16 / 9,
-    //   // autoInitialize: true,
-    // );
 
     /* Flutter download */
     _bindBackgroundIsolate();
@@ -105,47 +102,48 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   isDownloaded() async {
-//    var contain = Resources.listOfDownloadedFiles
-//        .where((element) => element.mp4Url == videoModel.mp4URL);
-//    if (contain.isNotEmpty) downloaded = true;
+    var contain = Constant.listOfDownloadedFiles
+        .where((element) => element.mp4Url == videoModel.mp4URL);
+    if (contain.isNotEmpty) downloaded = true;
 
-    // final hasPermission = Platform.isAndroid
-    //     ? await Permission.storage.request().isGranted
-    //     : true;
+    final hasPermission = Platform.isAndroid
+        ? await Permission.storage.request().isGranted
+        : true;
 
-    // if (hasPermission) {
-    //   final externalDir = await getDownloadDirectory();
-    //   print("Directory: ${externalDir.path}/videoModel.videoTitle.mp4");
-    //   String loc =
-    //       '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
-    //   File videoFile = new File(loc);
-    //   if (videoFile.existsSync()) {
-    //     if (mounted) {
-    //       setState(() {
-    //         downloaded = true;
-    //       });
-    //     } else {
-    //       downloaded = true;
-    //     }
+    if (hasPermission) {
+      final externalDir = await getDownloadDirectory();
+      print("Directory: ${externalDir.path}/videoModel.videoTitle.mp4");
+      String loc =
+          '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
+      File videoFile = new File(loc);
+      if (videoFile.existsSync()) {
+        if (mounted) {
+          setState(() {
+            downloaded = true;
+          });
+        } else {
+          downloaded = true;
+        }
 
-    //     var contain = Resources.listOfDownloadedFiles
-    //         .where((element) => element.mp4Url == videoModel.mp4URL);
-    //     if (contain.isEmpty) {
-    //       DatabaseHelper databaseHelper = DatabaseHelper();
-    //       //we need fileLocation, fileUrl, time
-    //       DownloadedFile downloadedFile = DownloadedFile(
-    //           mp4Url: videoModel.mp4URL,
-    //           fileLocation: loc,
-    //           downloadTime: DateTime.now().toString());
-    //       int result =
-    //           await databaseHelper.insertFile(downloadedFile: downloadedFile);
-    //       if (result != 0) {
-    //         //update DownloadedFilesList (inside Resourse class)
-    //         loadDownloadedFilesList();
-    //       }
-    //     }
-    //   }
-    // }
+        var contain = Constant.listOfDownloadedFiles
+            .where((element) => element.mp4Url == videoModel.mp4URL);
+        if (contain.isEmpty) {
+          DatabaseHelper databaseHelper = DatabaseHelper();
+          //we need fileLocation, fileUrl, time
+          DownloadedFile downloadedFile = DownloadedFile(
+            mp4Url: videoModel.mp4URL,
+            fileLocation: loc,
+            downloadTime: DateTime.now().toString(),
+          );
+          int result =
+              await databaseHelper.insertFile(downloadedFile: downloadedFile);
+          if (result != 0) {
+            //update DownloadedFilesList (inside Resourse class)
+            Methods.loadDownloadedFilesList();
+          }
+        }
+      }
+    }
   }
 
   Future<Directory> getDownloadDirectory() async {
@@ -174,18 +172,18 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           downloaded = true;
         });
         //save download data
-        // DatabaseHelper databaseHelper = DatabaseHelper();
-        // //we need fileLocation, fileUrl, time
-        // DownloadedFile downloadedFile = DownloadedFile(
-        //     mp4Url: videoModel.mp4URL,
-        //     fileLocation: fileLocation,
-        //     downloadTime: DateTime.now().toString());
-        // int result =
-        //     await databaseHelper.insertFile(downloadedFile: downloadedFile);
-        // if (result != 0) {
-        //   //update DownloadedFilesList (inside Resourse class)
-        //   loadDownloadedFilesList();
-        // }
+        DatabaseHelper databaseHelper = DatabaseHelper();
+        //we need fileLocation, fileUrl, time
+        DownloadedFile downloadedFile = DownloadedFile(
+            mp4Url: videoModel.mp4URL,
+            fileLocation: fileLocation,
+            downloadTime: DateTime.now().toString());
+        int result =
+            await databaseHelper.insertFile(downloadedFile: downloadedFile);
+        if (result != 0) {
+          //update DownloadedFilesList (inside Resourse class)
+          Methods.loadDownloadedFilesList();
+        }
       }
     });
   }
@@ -217,7 +215,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                         ),
                       )
                     : Container(
-                        height: 400,
+                        height: 320,
                         child: Center(child: CircularProgressIndicator())),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -238,23 +236,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                       ),
                       Column(
                         children: [
-                          SubscribeWidget(
-                            videoModel.sub,
-                            onClick: (status) async {
-                              // Response response = await Dio().post(
-                              //     "http://${Resources.BASE_URL}/subscribe/add",
-                              //     data: {
-                              //       "userID": Resources.userID,
-                              //       "ChannelID": videoModel.channelID
-                              //     });
+                          // SubscribeWidget(
+                          //   videoModel.sub,
+                          //   onClick: (status) async {
+                          //     // Response response = await Dio().post(
+                          //     //     "http://${Resources.BASE_URL}/subscribe/add",
+                          //     //     data: {
+                          //     //       "userID": Resources.userID,
+                          //     //       "ChannelID": videoModel.channelID
+                          //     //     });
 
-                              // setState(() {
-                              //   videoModel.sub = status;
-                              // });
+                          //     // setState(() {
+                          //     //   videoModel.sub = status;
+                          //     // });
 
-                              // //getAllVideos();
-                            },
-                          ),
+                          //     // //getAllVideos();
+                          //   },
+                          // ),
                           Row(
                             children: [
                               downloaded
@@ -280,46 +278,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                     ],
                   ),
                 ),
-                _progress
-                    ? Center(child: CircularProgressIndicator())
-                    : _videoList.length > 0
-                        ? RefreshIndicator(
-                            onRefresh: () async {
-                              //load all videos
-                            },
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: ScrollPhysics(),
-                                itemCount: _videoList.length,
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                    //I convert Car to Container to remove elevation and match to design
-                                    child: Container(
-                                      // elevation: 5,
-                                      padding: EdgeInsets.only(top: 16),
-                                      child: Text('ChannelVideoWidget'),
-                                      // child: ChannelVideoWidget(
-                                      //     _videoList[index], () {
-                                      //   Navigator.push(
-                                      //       context,
-                                      //       MaterialPageRoute(
-                                      //           builder: (builder) =>
-                                      //               VideoPlayerScreen(
-                                      //                   videoModel: _videoList[
-                                      //                       index])));
-                                      // }, () {
-                                      //   // getAllVideos();
-                                      // }, () {
-                                      //   onDeleteButtonPressed(
-                                      //       _videoList[index].videoId);
-                                      // }),
-                                    ),
-                                  );
-                                }),
-                          )
-                        : Center(child: Text("No Video Found"))
+                recommendedVideoListWidget(),
               ],
             ),
           ),
@@ -328,45 +287,82 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     );
   }
 
+  recommendedVideoListWidget() {
+    return Consumer<VideosService>(
+      builder: (context, videoservice, child) {
+        if (videoservice.recommendedVideosList == null) {
+          videoservice.loadRecommendedVideosList();
+          return Center(child: CircularProgressIndicator());
+        } else if (videoservice.recommendedVideosList.length == 0) {
+          return Container();
+        } else {
+          List<VideoModel> videosList = videoservice.recommendedVideosList;
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: ScrollPhysics(),
+            itemCount: videosList.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                //I convert Car to Container to remove elevation and match to design
+                child: Container(
+                  // elevation: 5,
+                  padding: EdgeInsets.only(top: 16),
+                  child: VideoItemWidget(
+                    video: videosList[index],
+                    onPlay: () {
+                      Methods.navigateToPage(context,
+                          VideoPlayerScreen(videoModel: videosList[index]));
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
   Future<void> shareLink() async {
     await Methods.shareLink(video: videoModel);
   }
 
   Future<void> downloadFile() async {
-    // if (!downloaded) {
-    //   if (!Resources.downloadingVideosList.contains(videoModel)) {
-    //     Resources.downloadingVideosList.add(videoModel);
-    //   }
-    //   beginColor = Colors.green;
-    //   _colorAnimation = ColorTween(begin: beginColor, end: endColor)
-    //       .animate(_animationController)
-    //         ..addListener(() {
-    //           setState(() {});
-    //         });
-    //   _animationController.repeat(reverse: true);
-    //   final hasPermission = Platform.isAndroid
-    //       ? await Permission.storage.request().isGranted
-    //       : true;
+    if (!downloaded) {
+      if (!Constant.downloadingVideosList.contains(videoModel)) {
+        Constant.downloadingVideosList.add(videoModel);
+      }
+      beginColor = Colors.green;
+      _colorAnimation = ColorTween(begin: beginColor, end: endColor)
+          .animate(_animationController)
+            ..addListener(() {
+              setState(() {});
+            });
+      _animationController.repeat(reverse: true);
+      final hasPermission = Platform.isAndroid
+          ? await Permission.storage.request().isGranted
+          : true;
 
-    //   if (hasPermission) {
-    //     final externalDir = await getDownloadDirectory();
-    //     print("Directory: ${externalDir.path}/videoModel.videoTitle.mp4");
-    //     fileLocation =
-    //         '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
+      if (hasPermission) {
+        final externalDir = await getDownloadDirectory();
+        print("Directory: ${externalDir.path}/videoModel.videoTitle.mp4");
+        fileLocation =
+            '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
 
-    //     final id = await FlutterDownloader.enqueue(
-    //         url: videoModel.mp4URL,
-    //         savedDir: externalDir.path,
-    //         fileName:
-    //             "${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4",
-    //         showNotification: true,
-    //         openFileFromNotification: false);
-    //     showToast(message: "Downloading started.");
-    //   } else {
-    //     print("Permission Denied");
-    //   }
-    // } else {
-    //   Methods.showToast(message: "Already Downloaded");
-    // }
+        final id = await FlutterDownloader.enqueue(
+            url: videoModel.mp4URL,
+            savedDir: externalDir.path,
+            fileName:
+                "${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4",
+            showNotification: true,
+            openFileFromNotification: false);
+        Methods.showToast(message: "Downloading started.");
+      } else {
+        print("Permission Denied");
+      }
+    } else {
+      Methods.showToast(message: "Already Downloaded");
+    }
   }
 }

@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:jewtubefirestore/enum/content_type.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/sqflite_helper.dart';
 import 'package:jewtubefirestore/model/video.dart';
@@ -85,5 +87,16 @@ class Methods {
 
   static shareLink({@required VideoModel video}) {
     Share.share(video.videoTitle);
+  }
+
+  static navigateToPage(context, page) {
+    Navigator.push(context, MaterialPageRoute(builder: (builder) => page));
+  }
+
+  static ContentType getContentType(String contenttype) {
+    if (contenttype.split("/")[0] == 'video') return ContentType.VIDEO;
+    // if (contenttype.split("/")[0] == 'image/png' ||
+    //     contenttype.split("/")[0] == 'image/jpeg') return ContentType.IMAGE;
+    return ContentType.IMAGE;
   }
 }

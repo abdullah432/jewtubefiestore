@@ -26,7 +26,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         settings,
       );
     case AddVideoScreenRoute:
-      return _getPageRoute(AddVideoScreen(), settings);
+      return _getPageRoute(AddVideoScreen(settings.arguments), settings);
     default:
       return _getPageRoute(SignInPage(), settings);
   }

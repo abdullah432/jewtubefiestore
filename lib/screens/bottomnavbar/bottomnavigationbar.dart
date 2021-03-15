@@ -5,6 +5,7 @@ import 'package:jewtubefirestore/screens/category/category_page.dart';
 import 'package:jewtubefirestore/screens/download/download_files_screen.dart';
 import 'package:jewtubefirestore/screens/home/home.dart';
 import 'package:jewtubefirestore/screens/subscription/subscriptionpage.dart';
+import 'package:jewtubefirestore/services/file_picker_service.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
@@ -13,6 +14,7 @@ import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/router/routing_names.dart';
 import 'package:jewtubefirestore/widgets/alertdialogs/newchanneldialog.dart';
 import 'package:jewtubefirestore/widgets/alertdialogs/selectchanneldialog.dart';
+import 'package:provider/provider.dart';
 import 'local_widgets/bottonnavbarwidget.dart';
 
 class MyBottomNavBarPage extends StatefulWidget {
@@ -73,7 +75,12 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
               context: context,
               dialog: SelectChannelDialogBox(
                 onChannelSelection: (channel) {
-                  locator<NavigationService>().navigateTo(AddVideoScreenRoute);
+                  final filepickerservice =
+                      Provider.of<FilePickerService>(context, listen: false);
+                  filepickerservice.clearFilePickItem();
+                  Navigator.pop(context);
+                  locator<NavigationService>()
+                      .navigateTo(AddVideoScreenRoute, arguments: channel);
                 },
               ),
             );

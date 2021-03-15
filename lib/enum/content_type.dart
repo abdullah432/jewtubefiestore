@@ -1,0 +1,4 @@
+enum ContentType {
+  VIDEO,
+  IMAGE,
+}

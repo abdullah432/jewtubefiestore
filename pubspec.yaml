@@ -35,6 +35,8 @@ dependencies:
   permission_handler: ^6.0.1
   video_thumbnail: ^0.2.5+1
   chewie: ^1.0.0
+  # aws_s3: ^0.1.1+hotfix.5
+  aws_s3_upload: ^1.1.2
   provider: ^5.0.0
   firebase_auth: ^1.0.0
   firebase_core: ^1.0.0
@@ -48,6 +50,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+dependency_overrides:
+  http: ^0.13.0
+  crypto: ^3.0.0
+  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -79,25 +79,25 @@ class _VideoItemWidgetHorizontalState extends State<VideoItemWidgetHorizontal> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 4,
-              child: SubscribeWidget(
-                widget.videoModel.sub,
-                onClick: (status) async {
-                  // Response response = await Dio().post(
-                  //     "http://${Resources.BASE_URL}/subscribe/add",
-                  //     data: {
-                  //       "userID": Resources.userID,
-                  //       "ChannelID": widget.videoModel.channelID
-                  //     });
+            // Expanded(
+            //   flex: 4,
+            //   child: SubscribeWidget(
+            //     widget.videoModel.sub,
+            //     onClick: (status) async {
+            //       // Response response = await Dio().post(
+            //       //     "http://${Resources.BASE_URL}/subscribe/add",
+            //       //     data: {
+            //       //       "userID": Resources.userID,
+            //       //       "ChannelID": widget.videoModel.channelID
+            //       //     });
 
-                  // setState(() {
-                  //   widget.videoModel.sub = status;
-                  //   widget.onSub();
-                  // });
-                },
-              ),
-            )
+            //       // setState(() {
+            //       //   widget.videoModel.sub = status;
+            //       //   widget.onSub();
+            //       // });
+            //     },
+            //   ),
+            // )
           ],
         ));
   }

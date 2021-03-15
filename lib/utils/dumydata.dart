@@ -25,10 +25,8 @@ class DumyData {
       videoTitle: 'videoTitle',
       videoURL: videourl,
       mp4URL: videourl,
-      videoId: 'videoId',
       thumbNail: videoThumbnail,
-      sub: false,
-      videoUuid: 'videoUuid',
+      category: 'Daily Dose',
     ),
     VideoModel(
       channelID: 'mAFpBAww1XeP9gnjK3pA',
@@ -38,10 +36,37 @@ class DumyData {
       videoTitle: 'videoTitle',
       videoURL: videourl2,
       mp4URL: videourl2,
-      videoId: 'videoId',
       thumbNail: videoThumbnail,
-      sub: false,
-      videoUuid: 'videoUuid',
+      category: 'Music',
+    ),
+  ];
+
+  static List<VideoModel> recommendedVideosList = [
+    VideoModel(
+      channelID: 'r19wNt07INpHDEfY6vQA',
+      channelName: 'Game',
+      channelImage:
+          'https://firebasestorage.googleapis.com/v0/b/jewtube-77fb7.appspot.com/o/channel%2FGame%2Favatar.png?alt=media&token=d6957f2b-7a9a-4b74-85c3-400e556a83f6',
+      videoTitle: 'videoTitle',
+      videoURL:
+          "https://jewtube-source-14c5ef0ws4cpc.s3-us-west-2.amazonaws.com/jewtube-_-_-1601935658046-_-_-VID-20201004-WA0005.mp4",
+      mp4URL:
+          "https://jewtube-source-14c5ef0ws4cpc.s3-us-west-2.amazonaws.com/jewtube-_-_-1602279932116-_-_-QU%C3%89+ES+LA+PAZ+INTERIOR+QU%C3%89+ES+EL+EXITO+EN+LA+VIDA.mp4",
+      thumbNail: videoThumbnail,
+      category: 'Music',
+    ),
+    VideoModel(
+      channelID: 'mAFpBAww1XeP9gnjK3pA',
+      channelName: 'Logan',
+      channelImage:
+          'https://firebasestorage.googleapis.com/v0/b/jewtube-77fb7.appspot.com/o/channel%2FLoganavatar.png?alt=media&token=f2d34a2e-127c-40dd-9815-dae2b8ba6336',
+      videoTitle: 'videoTitle',
+      videoURL:
+          "https://jewtube-source-14c5ef0ws4cpc.s3-us-west-2.amazonaws.com/jewtube-_-_-1602279932116-_-_-QU%C3%89+ES+LA+PAZ+INTERIOR+QU%C3%89+ES+EL+EXITO+EN+LA+VIDA.mp4",
+      mp4URL:
+          "https://jewtube-source-14c5ef0ws4cpc.s3-us-west-2.amazonaws.com/jewtube-_-_-1602279932116-_-_-QU%C3%89+ES+LA+PAZ+INTERIOR+QU%C3%89+ES+EL+EXITO+EN+LA+VIDA.mp4",
+      thumbNail: videoThumbnail,
+      category: 'Torah Classes',
     ),
   ];
 }

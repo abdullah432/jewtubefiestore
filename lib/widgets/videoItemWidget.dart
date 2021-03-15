@@ -117,23 +117,25 @@ class _VideoItemWidgetState extends State<VideoItemWidget> {
                             Icons.delete,
                             color: Colors.red,
                           ),
-                          onPressed: widget.onDeletePressed)
-                      : SubscribeWidget(
-                          widget.video.sub,
-                          onClick: (status) async {
-                            // Response response = await Dio().post(
-                            //     "http://${Resources.BASE_URL}/subscribe/add",
-                            //     data: {
-                            //       "userID": Resources.userID,
-                            //       "ChannelID": widget.videoModel.channelID
-                            //     });
-
-                            // setState(() {
-                            //   widget.videoModel.sub = status;
-                            //   widget.onSub();
-                            // });
-                          },
+                          onPressed: widget.onDeletePressed,
                         )
+                      : Container()
+                  // : SubscribeWidget(
+                  //     widget.video.sub,
+                  //     onClick: (status) async {
+                  //       // Response response = await Dio().post(
+                  //       //     "http://${Resources.BASE_URL}/subscribe/add",
+                  //       //     data: {
+                  //       //       "userID": Resources.userID,
+                  //       //       "ChannelID": widget.videoModel.channelID
+                  //       //     });
+
+                  //       // setState(() {
+                  //       //   widget.videoModel.sub = status;
+                  //       //   widget.onSub();
+                  //       // });
+                  //     },
+                  //   )
                   : Container(width: 0, height: 0)
             ],
           ),

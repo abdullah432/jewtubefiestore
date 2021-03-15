@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 
 class CustomAlertDialog extends StatelessWidget {
+  final String title;
+  final String content;
   final VoidCallback onConfirmClick;
   const CustomAlertDialog({
     @required this.onConfirmClick,
+    this.title: 'Delete',
+    this.content: 'Are you sure you want to delete this channel',
     Key key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Delete'),
-      content: Text('Are you sure you want to delete this channel'),
+      title: Text(title),
+      content: Text(content),
       actions: [
         TextButton(
           onPressed: onConfirmClick,

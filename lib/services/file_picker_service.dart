@@ -18,6 +18,9 @@ class FilePickerService with ChangeNotifier {
   void clearFilePickItem() {
     _pickedFile =
         PickedFile(file: null, pickedFileStatus: PickedFileStatus.NoStarted);
+    videoFile = null;
+    videoThumbnailFile = null;
+    customthumbnailFile = null;
     notifyListeners();
   }
 
@@ -46,7 +49,7 @@ class FilePickerService with ChangeNotifier {
     }
   }
 
-  void pickFile({@required FileType fileType}) async {
+  Future<bool> pickFile({@required FileType fileType}) async {
     print('filetype: ' + fileType.toString());
     try {
       _pickedFile =
@@ -66,15 +69,23 @@ class FilePickerService with ChangeNotifier {
         customthumbnailFile = file;
         _pickedFile = PickedFile(
             file: file, pickedFileStatus: PickedFileStatus.Completed);
+        notifyListeners();
+
+        return true;
       } else {
         // User canceled the picker
         _pickedFile = PickedFile(
             file: null, pickedFileStatus: PickedFileStatus.NoStarted);
+        notifyListeners();
+
+        return false;
       }
     } catch (e) {
       print(e.toString());
+      notifyListeners();
+
+      return false;
     }
-    notifyListeners();
   }
 }
 
