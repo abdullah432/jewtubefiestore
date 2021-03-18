@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:jewtubefirestore/model/user.dart';
+import 'package:jewtubefirestore/services/firestoreservice.dart';
+import 'package:jewtubefirestore/utils/constants.dart';
+import 'package:jewtubefirestore/utils/locator.dart';
+import 'package:jewtubefirestore/utils/naviation_services.dart';
+import 'package:jewtubefirestore/utils/router/routing_names.dart';
+import 'package:jewtubefirestore/widgets/loginalertdialog.dart';
+import 'package:provider/provider.dart';
 
 class SubscribeWidget extends StatefulWidget {
-  final String userID;
   final String channelID;
-  final bool status;
-  final Function(bool status) onClick;
-  SubscribeWidget(
-    this.status, {
+  SubscribeWidget({
     this.channelID,
-    this.userID,
-    @required this.onClick,
   });
 
   @override
@@ -18,6 +20,8 @@ class SubscribeWidget extends StatefulWidget {
 
 class _SubscribeWidgetState extends State<SubscribeWidget> {
   Color clr = Colors.blueGrey;
+  bool status = false;
+  CurrentUser currentuser;
 
   @override
   void initState() {
@@ -26,64 +30,47 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.status) {
+    currentuser = Provider.of<CurrentUser>(context, listen: false);
+    if (Constant.isSignedIn)
+      status = currentuser.subscribedTo.contains(widget.channelID);
+    if (status) {
       clr = Colors.grey;
     } else {
       clr = Colors.red;
     }
     return TextButton(
         onPressed: () {
-          // if (Resources.userID != "") {
-          //   setState(() {
-          //     widget.status = !widget.status;
-          //     print(widget.status);
-          //     widget.onClick(widget.status);
-          //   });
-          // } else {
-          //   Alert(
-          //     closeFunction: () {},
-          //     context: Resources.scaffoldKey.currentContext,
-          //     style: AlertStyle(
-          //       animationType: AnimationType.fromTop,
-          //       isCloseButton: true,
-          //       isOverlayTapDismiss: false,
-          //       descStyle: TextStyle(fontWeight: FontWeight.bold),
-          //       animationDuration: Duration(milliseconds: 400),
-          //       alertBorder: RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.circular(0.0),
-          //         side: BorderSide(
-          //           color: Colors.grey,
-          //         ),
-          //       ),
-          //       titleStyle: TextStyle(
-          //         color: Colors.red,
-          //       ),
-          //     ),
-          //     type: AlertType.info,
-          //     title: "LOGIN",
-          //     desc: "You need to login to enable these features.",
-          //     buttons: [
-          //       DialogButton(
-          //         child: Text(
-          //           "LOGIN",
-          //           style: TextStyle(color: Colors.white, fontSize: 20),
-          //         ),
-          //         onPressed: () {
-          //           Navigator.pop(Resources.scaffoldKey.currentContext);
-          //           Navigator.pushNamed(
-          //               Resources.scaffoldKey.currentContext, SIGN_IN);
-          //         },
-          //         color: Color.fromRGBO(0, 179, 134, 1.0),
-          //         radius: BorderRadius.circular(0.0),
-          //       ),
-          //     ],
-          //   ).show();
-          // }
+          if (Constant.isSignedIn) {
+            final database =
+                Provider.of<FirestoreService>(context, listen: false);
+            database.subscribeToChannel(
+              channeluid: widget.channelID,
+              useruid: currentuser.reference.id,
+            );
+
+            currentuser.subscribedTo.add(widget.channelID);
+
+            setState(() {});
+          } else {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return EnableSubscriptionDialogBox(
+                  onLoginClick: () {
+                    print('login');
+                    Navigator.pop(context);
+                    locator<NavigationService>().navigateTo(LoginRoute);
+                  },
+                );
+              },
+            );
+          }
         },
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.status ? "SUBSCRIBED" : "SUBSCRIBE",
+              status ? "SUBSCRIBED" : "SUBSCRIBE",
               style: TextStyle(color: clr, fontSize: 12),
             ),
           ],

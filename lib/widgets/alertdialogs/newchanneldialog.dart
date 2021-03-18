@@ -19,6 +19,7 @@ class CreateNewChannelDialogBox extends StatefulWidget {
 class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
   File profileImageFile;
   final channelNameController = TextEditingController();
+  bool isChannelCreationInPrgoress = false;
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -90,6 +91,9 @@ class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
                     onPressed: () async {
                       final channelService =
                           Provider.of<ChannelService>(context, listen: false);
+                      setState(() {
+                        isChannelCreationInPrgoress = true;
+                      });
                       await channelService.createChannel(
                         context,
                         channel: Channel(
@@ -127,6 +131,14 @@ class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
                   ),
                 ),
               ],
+            ),
+          ),
+
+          Visibility(
+            visible: isChannelCreationInPrgoress,
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: CircularProgressIndicator(),
             ),
           ),
         ],

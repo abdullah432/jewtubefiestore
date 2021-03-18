@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 
 class EnableSubscriptionDialogBox extends StatelessWidget {
-  const EnableSubscriptionDialogBox({Key key}) : super(key: key);
+  final VoidCallback onLoginClick;
+  const EnableSubscriptionDialogBox({
+    @required this.onLoginClick,
+    Key key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -10,8 +14,6 @@ class EnableSubscriptionDialogBox extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      // elevation: 0,
-      // backgroundColor: Colors.transparent,
       child: contentBox(context),
     );
   }
@@ -48,15 +50,13 @@ class EnableSubscriptionDialogBox extends StatelessWidget {
           Container(
             width: MediaQuery.of(context).size.width / 1.50,
             child: TextButton(
-              onPressed: () {},
+              onPressed: onLoginClick,
               style: TextButton.styleFrom(
                 backgroundColor: Colors.green,
               ),
-              child: Expanded(
-                child: Text(
-                  'LOGIN',
-                  style: TextStyle(color: Colors.white, fontSize: 18.0),
-                ),
+              child: Text(
+                'LOGIN',
+                style: TextStyle(color: Colors.white, fontSize: 18.0),
               ),
             ),
           ),

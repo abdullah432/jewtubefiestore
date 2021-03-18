@@ -32,11 +32,13 @@ class FirebaseAuthService with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      print(e.message.toString());
-      _userAuth = firebaseExceptionHandler(
-        exception: e,
-        isLogin: true,
-      );
+      print('exception message: ' + e.message);
+      _userAuth.error = e?.message ?? 'Unexpected issue';
+      _userAuth.authStatus = AuthStatus.RegistrationFail;
+      // _userAuth = firebaseExceptionHandler(
+      //   exception: e,
+      //   isLogin: true,
+      // );
       notifyListeners();
       return false;
     }
@@ -60,11 +62,13 @@ class FirebaseAuthService with ChangeNotifier {
       notifyListeners();
       return _userCredential.user;
     } catch (e) {
-      print('Signup Fail Exception: ' + e.toString());
-      _userAuth = firebaseExceptionHandler(
-        exception: e,
-        isLogin: false,
-      );
+      print('Signup Fail Exception: ' + e.message.toString());
+      _userAuth.error = e?.message ?? 'Unexpected issue';
+      _userAuth.authStatus = AuthStatus.RegistrationFail;
+      // _userAuth = firebaseExceptionHandler(
+      //   exception: e,
+      //   isLogin: false,
+      // );
       notifyListeners();
       return null;
     }

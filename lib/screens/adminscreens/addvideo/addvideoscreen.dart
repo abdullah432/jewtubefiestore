@@ -55,6 +55,8 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
       Methods.showToast(message: "Please enter a title");
     } else if (selectedCategory == null) {
       Methods.showToast(message: "Please select category");
+    } else if (thumbFile == null) {
+      Methods.showToast(message: "Please select custom thumbnail for video");
     } else {
       setState(() => isFileUploading = true);
 
@@ -71,20 +73,21 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
         category: selectedCategory,
       );
 
-      final videoservice = Provider.of<VideosService>(context, listen: false);
-      await videoservice.uploadVideo(context, video, thumbFile, videofile);
       // setState(() => isFileUploading = false);
 
       try {
         String result = await AwsS3.uploadFile(
-          accessKey: "AKIAWCKQN7QY2ST4V4U3",
-          secretKey: "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",
+          accessKey: "accesskey here",
+          secretKey: "secret key here",
           file: File(videofile.path),
           filename: Path.basename(videofile.path).toString(),
           bucket: "jewtube-source-14c5ef0ws4cpc",
           region: "us-west-2",
           destDir: videofile.path,
         );
+        video.videoURL = result;
+        final videoservice = Provider.of<VideosService>(context, listen: false);
+        await videoservice.uploadVideo(context, video, thumbFile, videofile);
         print('result: ' + result);
         print('success');
       } catch (e) {

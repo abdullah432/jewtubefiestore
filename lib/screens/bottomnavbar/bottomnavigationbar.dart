@@ -4,6 +4,7 @@ import 'package:jewtubefirestore/screens/bottomnavbar/local_widgets/drawerwidget
 import 'package:jewtubefirestore/screens/category/category_page.dart';
 import 'package:jewtubefirestore/screens/download/download_files_screen.dart';
 import 'package:jewtubefirestore/screens/home/home.dart';
+import 'package:jewtubefirestore/screens/searchpage/searchpage.dart';
 import 'package:jewtubefirestore/screens/subscription/subscriptionpage.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
@@ -49,6 +50,9 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
       key: scaffoldKey,
       drawer: MyDrawer(
         onAddChannelClick: () {
+          //first clear filepicker data
+          Provider.of<FilePickerService>(context, listen: false)
+              .clearFilePickItem();
           showDialog(
             context: context,
             builder: (context) {
@@ -92,9 +96,8 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
   }
 
   getPage(index) {
-    if (index == 0) {
-      return HomeScreen();
-    }
+    if (index == 0) return HomeScreen();
+
     if (index == 1) {
       return CategoryPage();
     } else if (index == 2) {
@@ -108,6 +111,7 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
     setState(() {
       _selectedIndex = index;
     });
+    print('finish');
   }
 
   appBar() {
@@ -115,17 +119,20 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
     return AppBar(
       iconTheme: IconThemeData(color: Colors.white),
       backgroundColor: Colors.red,
+      automaticallyImplyLeading: Constant.isAdmin,
       title: isSearchViewClicked
           ? TextField(
               style: TextStyle(color: Colors.white),
-              onSubmitted: (value) {
+              onSubmitted: (value) async {
                 isSearchViewClicked = false;
-                // print(value);
-                // Resources.navigationKey.currentState.pushReplacementNamed('/',
-                //     arguments: {'issearch': true, 'txt': value});
-                // // setState(() {
-                // //   queryText = value;
-                // // });
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchPage(queryText: value),
+                  ),
+                );
+
+                setState(() {});
               },
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
@@ -210,8 +217,9 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
               onPressed: () async {
                 final authService = FirebaseAuthService();
                 await authService.signOut();
-                print('signout');
-                await locator<NavigationService>().navigateTo(LoginRoute);
+                // print('signout');
+                // await locator<NavigationService>().navigateTo(LoginRoute);
+                Constant.isSignedIn = false;
                 setState(() {});
               },
             )

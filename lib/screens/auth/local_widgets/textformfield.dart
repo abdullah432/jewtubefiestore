@@ -31,6 +31,12 @@ class CustomTextField extends StatelessWidget {
       elevation: large ? 12 : (medium ? 10 : 8),
       child: TextFormField(
         controller: textEditingController,
+        validator: (text) {
+          if (text == null || text.isEmpty) {
+            return "This field can't be empty";
+          }
+          return null;
+        },
         keyboardType: keyboardType,
         cursorColor: Colors.orange[200],
         decoration: InputDecoration(

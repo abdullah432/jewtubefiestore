@@ -14,7 +14,7 @@ class DatabaseHelper {
 
   DatabaseHelper.createInstance();
 
-  String downloadTable = 'down_table';
+  String downloadTable = 'download_table';
   String colId = 'id';
   String colTime = 'time';
   String colLocation = 'location';
@@ -111,7 +111,7 @@ class DatabaseHelper {
     var downloadMapList = await getDownloadsMapList();
     int count = downloadMapList.length;
 
-    List<DownloadedFile> downloadList = List<DownloadedFile>();
+    List<DownloadedFile> downloadList = [];
     for (int i = 0; i < count; i++) {
       downloadList.add(DownloadedFile.fromMapObject(downloadMapList[i]));
     }

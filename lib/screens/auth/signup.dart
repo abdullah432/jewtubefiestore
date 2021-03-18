@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:jewtubefirestore/enum/auth_status.dart';
 import 'package:jewtubefirestore/model/user.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/services/firestoreservice.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
+import 'package:jewtubefirestore/utils/custom_colors.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
 import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
@@ -64,37 +66,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     // locator<NavigationService>()
                     //     .navigateAndReplaceTo(MyBottomNavBarRoute);
                     if (_formKey.currentState.validate()) {
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                      final database = context.read<FirestoreService>();
-                      var user = await context
-                          .read<FirebaseAuthService>()
-                          .createUserWithEmailAndPassword(
-                            _emailController.text.trim(),
-                            _passwordController.text.trim(),
+                      if (checkBoxValue) {
+                        FocusScope.of(context).requestFocus(new FocusNode());
+                        final database = context.read<FirestoreService>();
+                        final firebaseauth =
+                            context.read<FirebaseAuthService>();
+                        var user =
+                            await firebaseauth.createUserWithEmailAndPassword(
+                          _emailController.text.trim(),
+                          _passwordController.text.trim(),
+                        );
+                        if (user != null) {
+                          database.uid = user.uid;
+
+                          final currentUser = CurrentUser(
+                            name: _nameController.text.trim(),
+                            email: _emailController.text.trim(),
+                            isAdmin: false,
                           );
-                      if (user != null) {
-                        database.uid = user.uid;
+                          await database.createUser(user: currentUser);
 
-                        final currentUser = CurrentUser(
-                          name: _nameController.text.trim(),
-                          email: _emailController.text.trim(),
-                          isAdmin: false,
-                        );
-                        await database.createUser(user: currentUser);
+                          // Navigator.pop(context);
+                          locator<NavigationService>()
+                              .navigateAndReplaceTo(AuthRoute);
+                        }
 
-                        // Navigator.pop(context);
-                        locator<NavigationService>()
-                            .navigateAndReplaceTo(AuthRoute);
-                      }
-
-                      if (user == null) {
-                        Methods.showSnackbar(
-                          scafoldKey: scaffoldKey,
-                          message: context
-                              .read<FirebaseAuthService>()
-                              .userAuth
-                              .error,
-                        );
+                        if (user == null) {
+                          Methods.showSnackbar(
+                            scafoldKey: scaffoldKey,
+                            message: firebaseauth.userAuth.error,
+                          );
+                        }
+                      } else {
+                        Methods.showToast(
+                            message: 'Please accept terms and condition');
                       }
                     }
                   },
@@ -107,6 +112,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // infoTextRow(),
                 // socialIconsRow(),
                 signInTextRow(),
+                //login in progress widget
+                Consumer<FirebaseAuthService>(
+                  builder: (context, data, child) {
+                    return data.userAuth.authStatus ==
+                            AuthStatus.RegistrationInProgress
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              valueColor: new AlwaysStoppedAnimation<Color>(
+                                CustomColor.primaryColor,
+                              ),
+                            ),
+                          )
+                        : Container(height: 0.0);
+                  },
+                ),
               ],
             ),
           ),

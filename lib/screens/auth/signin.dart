@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:jewtubefirestore/enum/auth_status.dart';
 import 'package:jewtubefirestore/screens/auth/local_widgets/welcomtext.dart';
 import 'package:jewtubefirestore/screens/bottomnavbar/bottomnavigationbar.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
+import 'package:jewtubefirestore/utils/custom_colors.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
+import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/responsive_ui.dart';
 import 'package:jewtubefirestore/utils/router/routing_names.dart';
+import 'package:provider/provider.dart';
 import 'local_widgets/custom_shape.dart';
 import 'local_widgets/customelevatedbtn.dart';
 import 'local_widgets/textformfield.dart';
@@ -60,14 +64,29 @@ class _SignInScreenState extends State<SignInScreen> {
               SizedBox(height: 12.0),
               CustomElevatedButton(
                 onPressed: () async {
-                  final authService = FirebaseAuthService();
-                  bool result = await authService.signInWithEmailAndPassword(
-                    emailController.text.trim(),
-                    passwordController.text.trim(),
-                  );
-                  if (result)
-                    locator<NavigationService>()
-                        .navigateAndReplaceTo(AuthRoute);
+                  try {
+                    final authService = Provider.of<FirebaseAuthService>(
+                        context,
+                        listen: false);
+                    bool result = await authService.signInWithEmailAndPassword(
+                      emailController.text.trim(),
+                      passwordController.text.trim(),
+                    );
+                    if (result)
+                      locator<NavigationService>()
+                          .navigateAndReplaceTo(AuthRoute);
+                    if (!result) {
+                      String message = authService.userAuth.error;
+                      print('message: ' + message.toString());
+                      Methods.showToast(
+                        message: message,
+                      );
+                    }
+                  } catch (e) {
+                    Methods.showToast(
+                      message: e.Message,
+                    );
+                  }
                 },
                 title: 'LOGIN',
                 width: _large
@@ -76,6 +95,20 @@ class _SignInScreenState extends State<SignInScreen> {
                 fontSize: _large ? 16 : (_medium ? 14 : 12),
               ),
               signUpTextRow(),
+              //login in progress widget
+              Consumer<FirebaseAuthService>(
+                builder: (context, data, child) {
+                  return data.userAuth.authStatus == AuthStatus.LogingInProgress
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            valueColor: new AlwaysStoppedAnimation<Color>(
+                              CustomColor.primaryColor,
+                            ),
+                          ),
+                        )
+                      : Container(height: 0.0);
+                },
+              ),
             ],
           ),
         ),

@@ -8,6 +8,7 @@ import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/services/firestoreservice.dart';
 import 'package:jewtubefirestore/services/videosService.dart';
 import 'package:jewtubefirestore/utils/locator.dart';
+import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:jewtubefirestore/utils/naviation_services.dart';
 import 'package:jewtubefirestore/utils/router/router.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ Future<void> main() async {
       );
   //start loading list of downloaded files
   //function is written in 'package:jewtube/util/utils.dart'
-  // loadDownloadedFilesList();
+  Methods.loadDownloadedFilesList();
   setupLocator();
   runApp(MyApp());
 }

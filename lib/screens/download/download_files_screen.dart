@@ -99,6 +99,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
           ListView.builder(
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
+            itemCount: Constant.listOfDownloadedFiles.length,
             itemBuilder: (BuildContext context, int index) {
               String filePath =
                   Constant.listOfDownloadedFiles[index].fileLocation;
@@ -121,12 +122,17 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
                           // So snapshot.data contains the not-yet-correctly formatted Image.
                           if (!snapshot.hasData) {
                             return Container(
-                                width: 140,
-                                height: 80,
-                                child:
-                                    Center(child: CircularProgressIndicator()));
+                              width: 140,
+                              height: 80,
+                              child: Center(child: CircularProgressIndicator()),
+                            );
                           }
-                          return Image.memory(snapshot.data, fit: BoxFit.cover);
+                          return Image.memory(
+                            snapshot.data,
+                            fit: BoxFit.cover,
+                            width: 160,
+                            height: 90,
+                          );
                         },
                       ),
                       SizedBox(
@@ -170,7 +176,6 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
                 ),
               );
             },
-            itemCount: Constant.listOfDownloadedFiles.length,
           )
         ],
       ),

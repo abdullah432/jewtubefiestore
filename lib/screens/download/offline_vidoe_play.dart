@@ -36,15 +36,29 @@ class _OfflineVideoPlayerState extends State<OfflineVideoPlayer>
     _videoPlayerController = VideoPlayerController.file(file);
 
     super.initState();
+    initVideoPlayer();
+    // //
+    // _chewieController = ChewieController(
+    //   // videoPlayerController: VideoPlayerController.network(videoModel.videoURL)..initialize(),
+    //   videoPlayerController: _videoPlayerController,
+    //   autoPlay: true,
+    //   looping: true,
+    //   // autoInitialize: true,
+    // );
+  }
 
-    //
+  Future<void> initVideoPlayer() async {
+    await _videoPlayerController.initialize();
+
+    print(_videoPlayerController.value.aspectRatio);
     _chewieController = ChewieController(
-      // videoPlayerController: VideoPlayerController.network(videoModel.videoURL)..initialize(),
       videoPlayerController: _videoPlayerController,
-      autoPlay: true,
-      looping: true,
-      // autoInitialize: true,
+      aspectRatio: _videoPlayerController.value.aspectRatio,
+      autoPlay: false,
+      looping: false,
     );
+
+    setState(() {});
   }
 
   @override
@@ -56,36 +70,52 @@ class _OfflineVideoPlayerState extends State<OfflineVideoPlayer>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            child: Column(
-              children: <Widget>[
-                Chewie(
-                  controller: _chewieController,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              basenameWithoutExtension(file.path),
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(''),
+        leading: IconButton(
+          color: Colors.black,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              _videoPlayerController.value.isInitialized
+                  ? AspectRatio(
+                      aspectRatio: _videoPlayerController.value.aspectRatio,
+                      child: Chewie(
+                        controller: _chewieController,
                       ),
-                    ],
-                  ),
+                    )
+                  : Container(
+                      height: 320,
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            basenameWithoutExtension(file.path),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

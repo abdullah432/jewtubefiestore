@@ -55,6 +55,7 @@ class Methods {
   static Future<void> loadDownloadedFilesList() async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    Constant.downloadingVideosList = [];
     dbFuture.then((database) {
       Future<List<DownloadedFile>> filesListFuture =
           databaseHelper.getDownloadedFilesList();
@@ -77,12 +78,13 @@ class Methods {
 
   static showToast({@required String message}) {
     Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0);
+      msg: message != null ? message : 'Unexpected error',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   static shareLink({@required VideoModel video}) {

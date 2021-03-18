@@ -11,4 +11,11 @@ class Constant {
 
   static final Color unselectedColor = Colors.grey[700];
   static final Color selectedColor = Colors.red;
+
+  static List<String> listOfcategories = [
+    'Daily Dose',
+    'Torah Classes',
+    'Movies',
+    'Music',
+  ];
 }

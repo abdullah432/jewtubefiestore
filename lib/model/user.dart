@@ -6,6 +6,7 @@ class CurrentUser with ChangeNotifier {
   String email;
   String profileurl;
   bool isAdmin;
+  List<dynamic> subscribedTo;
   DocumentReference reference;
 
   CurrentUser({this.name, this.email, this.profileurl, this.isAdmin});
@@ -16,7 +17,9 @@ class CurrentUser with ChangeNotifier {
     profileurl = user.profileurl;
     isAdmin = user.isAdmin;
     reference = user.reference;
+    subscribedTo = user.subscribedTo;
     if (isNotify) notifyListeners();
+    print('subscribedTo: ' + subscribedTo.toString());
   }
 
   Map<String, dynamic> toMap() {
@@ -25,6 +28,7 @@ class CurrentUser with ChangeNotifier {
       'email': email,
       'profileurl': profileurl,
       'isadmin': isAdmin,
+      'subscribedTo': [],
     };
   }
 
@@ -32,7 +36,8 @@ class CurrentUser with ChangeNotifier {
       : name = map['name'],
         email = map['email'],
         profileurl = map['profileurl'],
-        isAdmin = map['isadmin'];
+        isAdmin = map['isadmin'],
+        subscribedTo = List.from(map['subscribedTo']);
 
   CurrentUser.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data(), reference: snapshot.reference);

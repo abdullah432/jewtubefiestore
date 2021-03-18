@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/channel.dart';
+import 'package:jewtubefirestore/model/user.dart';
+import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/services/firestoreservice.dart';
 import 'package:provider/provider.dart';
 
@@ -12,9 +14,27 @@ class ChannelService with ChangeNotifier {
   final database = FirestoreService();
 
   List<Channel> channelsList;
+  List<Channel> subscribedChannelList;
+  List<VideoModel> subscribedChannelVideosList = [];
+
+  bool isRefresh = false;
 
   loadChannelList() async {
     channelsList = await database.loadChannelList();
+    notifyListeners();
+  }
+
+  loadSubscribedChannelData(context) async {
+    final currentuser = Provider.of<CurrentUser>(context, listen: false);
+    subscribedChannelList = await database.loadSubscribedChannelList(
+        subscribedTo: currentuser.subscribedTo);
+    subscribedChannelVideosList.clear();
+    //load each channel video one by one
+    for (int i = 0; i < subscribedChannelList.length; i++) {
+      List<VideoModel> videos = await database
+          .loadVideosByChannelID(subscribedChannelList[i].reference.id);
+      subscribedChannelVideosList.addAll(videos);
+    }
     notifyListeners();
   }
 

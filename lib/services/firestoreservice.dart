@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jewtubefirestore/model/channel.dart';
@@ -8,7 +6,6 @@ import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:provider/provider.dart';
-import 'firebasestorageservice.dart';
 
 enum FirestoreJob {
   JobNotStartedYet,
@@ -57,12 +54,44 @@ class FirestoreService with ChangeNotifier {
   }
 
   Future<List<VideoModel>> loadAllVideos() async {
-    final ref = db.collection("videos");
+    final ref = db.collection("videos").orderBy('uploadTime', descending: true);
     var snapshot = await ref.get();
     final List<VideoModel> videolist = snapshot.docs
         .map((snapshot) => VideoModel.fromSnapshot(snapshot))
         .toList();
     return videolist;
+  }
+
+  Future<List<VideoModel>> loadVideosByChannelID(String channelID) async {
+    final ref = db.collection("videos");
+    var snapshot = await ref
+        .where(
+          'channelID',
+          isEqualTo: channelID,
+        )
+        .orderBy('uploadTime', descending: true)
+        .get();
+    final List<VideoModel> videolist = snapshot.docs
+        .map((snapshot) => VideoModel.fromSnapshot(snapshot))
+        .toList();
+    return videolist;
+  }
+
+  Future<List<VideoModel>> searchVideos(String queryText) async {
+    final ref = db.collection("videos");
+    var snapshot = await ref
+        .orderBy('videoTitle')
+        .startAt([queryText.toUpperCase()]).endAt([queryText.toLowerCase()])
+        // .limit(15)
+        .get();
+    final List<VideoModel> videolist = snapshot.docs
+        .map((snapshot) => VideoModel.fromSnapshot(snapshot))
+        .toList();
+    return videolist;
+  }
+
+  Future<void> deleteVideo(VideoModel video) async {
+    db.collection("videos").doc(video.reference.id).delete();
   }
 
   Future<CurrentUser> loadUserData(context, {useruid}) async {
@@ -118,10 +147,39 @@ class FirestoreService with ChangeNotifier {
     }
   }
 
+  Future<List<Channel>> loadSubscribedChannelList({subscribedTo}) async {
+    try {
+      final authService = FirebaseAuthService();
+      List<Channel> subscribedChannelsList = [];
+      if (authService.isUserLoggedIn()) {
+        for (int i = 0; i < subscribedTo.length; i++) {
+          var snapshot =
+              await db.collection('channels').doc(subscribedTo[i]).get();
+          subscribedChannelsList.add(Channel.fromSnapshot(snapshot));
+        }
+
+        return subscribedChannelsList;
+      } else {
+        print('isUserLoggedIn: false');
+        return [];
+      }
+    } catch (e) {
+      print('error');
+      print(e.toString());
+      return [];
+    }
+  }
+
   Future<bool> uploadVideo(VideoModel video) async {
     final ref = db.collection("videos").doc();
     await ref.set(video.toMap());
     return true;
+  }
+
+  subscribeToChannel({@required channeluid, @required useruid}) {
+    db.collection("users").doc(useruid).update({
+      'subscribedTo': FieldValue.arrayUnion([channeluid]),
+    });
   }
 
   deleteChannel(channeluid) async {

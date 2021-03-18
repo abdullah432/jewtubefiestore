@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:jewtubefirestore/model/video.dart';
+import 'package:jewtubefirestore/screens/channel/channelscreen.dart';
+import 'package:jewtubefirestore/screens/videoplayer/videoPlay.dart';
+import 'package:jewtubefirestore/services/videosService.dart';
+import 'package:jewtubefirestore/utils/methods.dart';
+import 'package:jewtubefirestore/widgets/alertdialogs/CustomAlertDialog.dart';
 import 'package:jewtubefirestore/widgets/videoItemWidget.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
-import 'package:jewtubefirestore/utils/dumydata.dart';
+import 'package:provider/provider.dart';
 
 class CategoryPage extends StatefulWidget {
   @override
@@ -12,77 +16,83 @@ class CategoryPage extends StatefulWidget {
 }
 
 class CategoryPageState extends State<CategoryPage> {
-  int selectedCategoryIndex = 0;
-
-  //category parameters
-  List<String> listOfcategories = [
-    'Daily Dose',
-    'Torah Classes',
-    'Movies',
-    'Music',
-  ];
-
-  //future list of videos
-  Future<List<VideoModel>> futureVideos;
-
-  @override
-  void initState() {
-    super.initState();
-    futureVideos = fetchVideos();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<VideoModel>>(
-        future: futureVideos,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Column(
-              children: [
-                // SizedBox(
-                //   height: 15.0,
-                // ),
-                categoryWidget(),
-                SizedBox(
-                  height: 15.0,
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        //I convert Car to Container to remove elevation and match to design
-                        child: Container(
-                          child: VideoItemWidget(
-                            video: snapshot.data[index],
-                            onPlay: () {
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (builder) => VideoPlayerScreen(
-                              //             videoModel: snapshot.data[index])));
-                            },
-                            onSubscribe: () {
-                              //subscribe
-                            },
-                            onDeletePressed: () {},
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          } else if (snapshot.hasError) {
-            return Center(child: Text("${snapshot.error}"));
-          }
+      body: Consumer<VideosService>(
+        builder: (context, videoservice, child) {
           // By default, show a loading spinner.
+          return Column(
+            children: [
+              categoryWidget(videoservice),
+              SizedBox(
+                height: 15.0,
+              ),
+              categorPageContentScreen(videoservice),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  categorPageContentScreen(VideosService videoservice) {
+    if (videoservice.categoryVideosList == null) {
+      videoservice.filterVideoByCategory();
+      return Padding(
+        padding: const EdgeInsets.only(top: 30.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    } else if (videoservice.categoryVideosList.length == 0) {
+      return Center(child: Text("No video found"));
+    }
+    return Expanded(
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: videoservice.categoryVideosList.length,
+        itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.only(top: 30.0),
-            child: Center(child: CircularProgressIndicator()),
+            padding: const EdgeInsets.only(bottom: 10.0),
+            //I convert Car to Container to remove elevation and match to design
+            child: Container(
+              child: VideoItemWidget(
+                video: videoservice.categoryVideosList[index],
+                onPlay: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => VideoPlayerScreen(
+                          videoModel: videoservice.categoryVideosList[index]),
+                    ),
+                  );
+                },
+                onChannelAvatarClick: (video) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChannelPage(
+                        channelId: video.channelID,
+                        channelName: video.channelName,
+                        profileUrl: video.channelImage,
+                      ),
+                    ),
+                  );
+                },
+                onDeletePressed: (video) {
+                  Methods.showAlertDialog(
+                    context: context,
+                    dialog: CustomAlertDialog(
+                      content: 'Are you sure you want to delete this video',
+                      onConfirmClick: () {
+                        Navigator.pop(context);
+                        //delete
+                        videoservice.deleteVideo(context, video: video);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
           );
         },
       ),
@@ -90,7 +100,7 @@ class CategoryPageState extends State<CategoryPage> {
   }
 
   //category Widget
-  categoryWidget() {
+  categoryWidget(VideosService videosService) {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Column(
@@ -100,10 +110,7 @@ class CategoryPageState extends State<CategoryPage> {
             //Daily Dose
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  //passing zero index: mean 0 index is clicked
-                  changeCategorySelection(0);
-                },
+                onTap: () => videosService.updateCategorySelection(0),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -120,7 +127,7 @@ class CategoryPageState extends State<CategoryPage> {
                         Flexible(
                           child: Icon(
                             Icons.assignment,
-                            color: selectedCategoryIndex == 0
+                            color: videosService.selectedCategoryIndex == 0
                                 ? Constant.selectedColor
                                 : Constant.unselectedColor,
                           ),
@@ -131,7 +138,7 @@ class CategoryPageState extends State<CategoryPage> {
                         Flexible(
                           child: Text("Daily Dose",
                               style: TextStyle(
-                                color: selectedCategoryIndex == 0
+                                color: videosService.selectedCategoryIndex == 0
                                     ? Constant.selectedColor
                                     : Constant.unselectedColor,
                                 fontWeight: FontWeight.w500,
@@ -149,10 +156,7 @@ class CategoryPageState extends State<CategoryPage> {
             //Torah Classes
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  //passing 1 index: mean index 1 is clicked
-                  changeCategorySelection(1);
-                },
+                onTap: () => videosService.updateCategorySelection(1),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -169,7 +173,7 @@ class CategoryPageState extends State<CategoryPage> {
                         Flexible(
                           child: Icon(
                             Icons.local_florist,
-                            color: selectedCategoryIndex == 1
+                            color: videosService.selectedCategoryIndex == 1
                                 ? Constant.selectedColor
                                 : Constant.unselectedColor,
                           ),
@@ -180,7 +184,7 @@ class CategoryPageState extends State<CategoryPage> {
                         Flexible(
                           child: Text("Torah Classes",
                               style: TextStyle(
-                                color: selectedCategoryIndex == 1
+                                color: videosService.selectedCategoryIndex == 1
                                     ? Constant.selectedColor
                                     : Constant.unselectedColor,
                                 fontWeight: FontWeight.w500,
@@ -201,10 +205,7 @@ class CategoryPageState extends State<CategoryPage> {
             //Movies
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  //passing 2 index: mean 2 index is clicked
-                  changeCategorySelection(2);
-                },
+                onTap: () => videosService.updateCategorySelection(2),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -220,7 +221,7 @@ class CategoryPageState extends State<CategoryPage> {
                       children: [
                         Icon(
                           Icons.movie_filter,
-                          color: selectedCategoryIndex == 2
+                          color: videosService.selectedCategoryIndex == 2
                               ? Constant.selectedColor
                               : Constant.unselectedColor,
                         ),
@@ -229,7 +230,7 @@ class CategoryPageState extends State<CategoryPage> {
                         ),
                         Text("Movies",
                             style: TextStyle(
-                              color: selectedCategoryIndex == 2
+                              color: videosService.selectedCategoryIndex == 2
                                   ? Constant.selectedColor
                                   : Constant.unselectedColor,
                               fontWeight: FontWeight.w500,
@@ -246,10 +247,7 @@ class CategoryPageState extends State<CategoryPage> {
             //Music
             Expanded(
               child: GestureDetector(
-                onTap: () {
-                  //passing index 3: mean 3rd index is clicked
-                  changeCategorySelection(3);
-                },
+                onTap: () => videosService.updateCategorySelection(3),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -265,7 +263,7 @@ class CategoryPageState extends State<CategoryPage> {
                       children: [
                         Icon(
                           Icons.music_note,
-                          color: selectedCategoryIndex == 3
+                          color: videosService.selectedCategoryIndex == 3
                               ? Constant.selectedColor
                               : Constant.unselectedColor,
                         ),
@@ -274,7 +272,7 @@ class CategoryPageState extends State<CategoryPage> {
                         ),
                         Text("Music",
                             style: TextStyle(
-                              color: selectedCategoryIndex == 3
+                              color: videosService.selectedCategoryIndex == 3
                                   ? Constant.selectedColor
                                   : Constant.unselectedColor,
                               fontWeight: FontWeight.w500,
@@ -289,82 +287,5 @@ class CategoryPageState extends State<CategoryPage> {
         ],
       ),
     );
-  }
-
-  //select category
-  changeCategorySelection(index) {
-    futureVideos = null;
-    setState(() {
-      selectedCategoryIndex = index;
-      // futureVideos = fetchVideos();
-    });
-  }
-
-  // Future<void> deleteVideo(String videoId) async {
-  //   Response response =
-  //       await Dio().get("http://${Resources.BASE_URL}/post/delete/$videoId");
-  //   if (response.data != null) {
-  //     showToast(message: response.data.toString());
-  //   } else {
-  //     showToast(message: "Error: video deletion failed.");
-  //   }
-  // }
-
-  // void onDeleteButtonPressed(String videoId) {
-  //   deleteVideo(videoId).whenComplete(() {
-  //     setState(() {
-  //       futureVideos = fetchVideos();
-  //     });
-  //   });
-  // }
-
-  //fetch videos logic
-  Future<List<VideoModel>> fetchVideos() async {
-    return DumyData.videosList;
-    //   //subarray will be used to determined as the video channel is subscribed or not
-    //   var subArray = List();
-    //   //retrieve subscribed channel list
-    //   if (Resources.userID != "") {
-    //     //retrieve all the subscriber
-    //     Response responseSubscriber = await Dio()
-    //         .get("http://${Resources.BASE_URL}/subscribe/${Resources.userID}");
-
-    //     if (responseSubscriber.data != null) {
-    //       // print("Sub.data: "+sub.data);
-    //       subArray = responseSubscriber.data['channel'];
-    //     }
-    //   }
-
-    //   //After that now retrieve videos
-    //   String selectedCategory = listOfcategories[selectedCategoryIndex];
-    //   String url =
-    //       "http://${Resources.BASE_URL}/video/getvideos/bycategory/${selectedCategory}";
-    //   Response response = await Dio().get(url);
-
-    //   if (response.statusCode == 200) {
-    //     // If the server did return a 200 OK response,
-    //     // then parse the JSON.
-    //     // print(response.data);
-    //     if (response.statusCode == 200) {
-    //       List<VideoModel> list = (response.data as List)
-    //           .map((v) => VideoModel.fromJson(json: v, subArray: subArray))
-    //           .toList();
-
-    //       final existing = Set<String>();
-    //       // List<VideoModel> uniqueCards = list.where((video) => existing.add(video.videoId)).toList();
-    //       final unique = list
-    //           .where((videoModel) => existing.add(videoModel.videoId))
-    //           .toList();
-    //       print(unique);
-    //       // print(list[0].videoId);
-    //       return unique.toList();
-    //     } else {
-    //       print(response.data["status"]);
-    //     }
-    //   } else {
-    //     // If the server did not return a 200 OK response,
-    //     // then throw an exception.
-    //     throw Exception('Failed to load album');
-    //   }
   }
 }

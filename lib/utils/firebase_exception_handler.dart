@@ -39,6 +39,12 @@ UserAuth firebaseExceptionHandler({
               isLogin ? AuthStatus.LoggedInFail : AuthStatus.RegistrationFail,
           error: 'Sign in aborted by user',
         );
+      case 'Password should be at least 6 characters':
+        return UserAuth(
+          authStatus:
+              isLogin ? AuthStatus.LoggedInFail : AuthStatus.RegistrationFail,
+          error: 'Password should be at least 6 characters',
+        );
       // ...
       default:
         return UserAuth(

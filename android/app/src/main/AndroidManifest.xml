@@ -7,7 +7,7 @@
 
 
 
-  <application android:label="jewtubefirestore" android:icon="@mipmap/ic_launcher">
+  <application android:label="jewtubefirestore" android:icon="@mipmap/launcher_icon" android:usesCleartextTraffic="true">
 
     <!--Download plugin configration-->
     <provider android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider" android:authorities="${applicationId}.flutter_downloader.provider" android:exported="false" android:grantUriPermissions="true">

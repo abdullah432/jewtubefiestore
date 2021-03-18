@@ -10,6 +10,8 @@ class DumyData {
       'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
   static String videourl2 =
       'https://jewtube-source-14c5ef0ws4cpc.s3-us-west-2.amazonaws.com/jewtube-_-_-1601921469467-_-_-7502fd86663c4249a6b22130aef702d9.mp4';
+  static String videourl3 =
+      'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4';
   static String videoThumbnail =
       'https://upload.wikimedia.org/wikipedia/commons/3/31/Big.Buck.Bunny.-.Frank.Bunny.png';
   static List<Channel> channelList = [

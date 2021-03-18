@@ -11,6 +11,7 @@ class VideoModel {
   String thumbNail;
   String customThumb;
   String category;
+  DateTime uploadTime;
   bool isVideoProcessingComplete;
   DocumentReference reference;
 
@@ -22,6 +23,7 @@ class VideoModel {
     @required this.videoURL,
     @required this.mp4URL,
     @required this.category,
+    this.uploadTime,
     this.thumbNail,
     this.isVideoProcessingComplete,
   });
@@ -37,6 +39,7 @@ class VideoModel {
       'category': category,
       'thumbNail': thumbNail,
       'customThumb': customThumb,
+      'uploadTime': DateTime.now(),
       'isVideoProcessingComplete': isVideoProcessingComplete,
     };
   }
