@@ -48,19 +48,21 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
     return Scaffold(
       // backgroundColor: Colors.transparent,
       key: scaffoldKey,
-      drawer: MyDrawer(
-        onAddChannelClick: () {
-          //first clear filepicker data
-          Provider.of<FilePickerService>(context, listen: false)
-              .clearFilePickItem();
-          showDialog(
-            context: context,
-            builder: (context) {
-              return CreateNewChannelDialogBox();
-            },
-          );
-        },
-      ),
+      drawer: Constant.isAdmin
+          ? MyDrawer(
+              onAddChannelClick: () {
+                //first clear filepicker data
+                Provider.of<FilePickerService>(context, listen: false)
+                    .clearFilePickItem();
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return CreateNewChannelDialogBox();
+                  },
+                );
+              },
+            )
+          : null,
       appBar: appBar(),
       bottomNavigationBar: BottomNavBarWidget(
         selectedIndex: _selectedIndex,
