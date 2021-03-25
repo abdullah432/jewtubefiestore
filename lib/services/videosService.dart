@@ -52,9 +52,9 @@ class VideosService with ChangeNotifier {
   }
 
   List<VideoModel> loadRecommendedVideosList(VideoModel currentlyplaying) {
-    recommendedVideosList = videosList;
+    recommendedVideosList = [];
+    recommendedVideosList.addAll(videosList);
     recommendedVideosList.remove(currentlyplaying);
-    recommendedVideosList = videosList;
     return recommendedVideosList;
   }
 
