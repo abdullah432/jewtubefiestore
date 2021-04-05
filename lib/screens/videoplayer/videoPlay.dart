@@ -7,13 +7,10 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/sqflite_helper.dart';
 import 'package:jewtubefirestore/model/video.dart';
-import 'package:jewtubefirestore/screens/channel/channelscreen.dart';
 import 'package:jewtubefirestore/services/videosService.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
-import 'package:jewtubefirestore/utils/dumydata.dart';
 import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:jewtubefirestore/widgets/alertdialogs/CustomAlertDialog.dart';
-import 'package:jewtubefirestore/widgets/videoItemWidget.dart';
 import 'package:jewtubefirestore/widgets/videoItemWidget2.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -103,11 +100,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   @override
   void dispose() {
+    disposeProcess();
+    super.dispose();
+  }
+
+  disposeProcess() {
     _videoPlayerController?.dispose();
     _chewieController?.dispose();
     _animationController?.dispose();
     _unbindBackgroundIsolate();
-    super.dispose();
   }
 
   isDownloaded() async {
@@ -268,23 +269,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                     ),
                     Column(
                       children: [
-                        // SubscribeWidget(
-                        //   videoModel.sub,
-                        //   onClick: (status) async {
-                        //     // Response response = await Dio().post(
-                        //     //     "http://${Resources.BASE_URL}/subscribe/add",
-                        //     //     data: {
-                        //     //       "userID": Resources.userID,
-                        //     //       "ChannelID": videoModel.channelID
-                        //     //     });
-
-                        //     // setState(() {
-                        //     //   videoModel.sub = status;
-                        //     // });
-
-                        //     // //getAllVideos();
-                        //   },
-                        // ),
                         Row(
                           children: [
                             downloaded
@@ -345,75 +329,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                     );
                   },
                   onPlay: () {
+                    _videoPlayerController.pause();
                     Methods.navigateToPage(
-                        context,
-                        VideoPlayerScreen(
-                            videoModel: recommendedVideosList[index]));
+                      context,
+                      VideoPlayerScreen(
+                          videoModel: recommendedVideosList[index]),
+                    );
                   },
                 ),
               );
             },
           );
-
-    // return Consumer<VideosService>(
-    //   builder: (context, videoservice, child) {
-    //     if (videoservice.recommendedVideosList == null) {
-    //       videoservice.loadRecommendedVideosList();
-    //       return Center(child: CircularProgressIndicator());
-    //     } else if (videoservice.recommendedVideosList.length == 0) {
-    //       return Container();
-    //     } else {
-    //       List<VideoModel> videosList = videoservice.recommendedVideosList;
-    //       return ListView.builder(
-    //         shrinkWrap: true,
-    //         physics: ScrollPhysics(),
-    //         itemCount: videosList.length,
-    //         itemBuilder: (context, index) {
-    //           return Padding(
-    //             padding: const EdgeInsets.symmetric(vertical: 16),
-    //             //I convert Car to Container to remove elevation and match to design
-    //             child: Container(
-    //               // elevation: 5,
-    //               padding: EdgeInsets.only(top: 16),
-    //               child: VideoItemWidget(
-    //                 video: videosList[index],
-    //                 onChannelAvatarClick: (video) {
-    //                   Navigator.push(
-    //                     context,
-    //                     MaterialPageRoute(
-    //                       builder: (context) => ChannelPage(
-    //                         channelId: video.channelID,
-    //                         channelName: video.channelName,
-    //                         profileUrl: video.channelImage,
-    //                       ),
-    //                     ),
-    //                   );
-    //                 },
-    //                 onDeletePressed: (video) {
-    //                   Methods.showAlertDialog(
-    //                     context: context,
-    //                     dialog: CustomAlertDialog(
-    //                       content: 'Are you sure you want to delete this video',
-    //                       onConfirmClick: () {
-    //                         Navigator.pop(context);
-    //                         //delete
-    //                         videoservice.deleteVideo(context, video: video);
-    //                       },
-    //                     ),
-    //                   );
-    //                 },
-    //                 onPlay: () {
-    //                   Methods.navigateToPage(context,
-    //                       VideoPlayerScreen(videoModel: videosList[index]));
-    //                 },
-    //               ),
-    //             ),
-    //           );
-    //         },
-    //       );
-    //     }
-    //   },
-    // );
   }
 
   Future<void> shareLink() async {

@@ -26,13 +26,15 @@ class _SelectChannelDialogBoxState extends State<SelectChannelDialogBox> {
   final channelNameController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+    return SingleChildScrollView(
+      child: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        // elevation: 0,
+        // backgroundColor: Colors.transparent,
+        child: contentBox(context),
       ),
-      // elevation: 0,
-      // backgroundColor: Colors.transparent,
-      child: contentBox(context),
     );
   }
 

@@ -18,6 +18,7 @@ class ChannelListView extends StatelessWidget {
     return ListView.builder(
         itemCount: channellist.length,
         shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           Channel channel = channellist[index];
           return ListTile(
