@@ -54,6 +54,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   ReceivePort _port = ReceivePort();
   String fileLocation;
 
+  //download progress
+  String downloadProgress;
+
   @override
   void initState() {
     _videoPlayerController = VideoPlayerController.network(videoModel.videoURL);
@@ -173,6 +176,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       }
       _port.listen((dynamic data) async {
         print('Data: ' + data.toString());
+        print('Data: ' + data[2].toString());
+        downloadProgress = data[2].toString();
         String id = data[0];
         DownloadTaskStatus status = data[1];
         print('status: ' + status.toString());
@@ -271,6 +276,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                       children: [
                         Row(
                           children: [
+                            //download status
+                            Text(
+                              downloadProgress != null
+                                  ? '$downloadProgress %'
+                                  : '',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            //download icon
                             downloaded
                                 ? IconButton(
                                     onPressed: () => downloadFile(),
@@ -281,7 +294,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                                     color: _colorAnimation.value,
                                     icon: Icon(Icons.file_download),
                                   ),
-                            SizedBox(width: 12.0),
+                            // SizedBox(width: 12.0),
                             IconButton(
                               onPressed: shareLink,
                               color: Colors.blueGrey,

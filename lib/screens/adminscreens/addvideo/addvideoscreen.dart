@@ -11,8 +11,6 @@ import 'package:jewtubefirestore/services/videosService.dart';
 import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:path/path.dart' as Path;
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:aws_s3_upload/aws_s3_upload.dart';
 
@@ -209,7 +207,8 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                                       onTap: () async {
                                         bool result = await filepickerservice
                                             .pickVideoFileForUpload(
-                                                fileType: FileType.video);
+                                          fileType: FileType.video,
+                                        );
                                         if (result) {
                                           videofile =
                                               filepickerservice.videoFile;

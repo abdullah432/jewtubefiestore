@@ -76,10 +76,11 @@ class Methods {
     );
   }
 
-  static showToast({@required String message}) {
+  static showToast(
+      {@required String message, toastLenght: Toast.LENGTH_SHORT}) {
     Fluttertoast.showToast(
       msg: message != null ? message : 'Unexpected error',
-      toastLength: Toast.LENGTH_SHORT,
+      toastLength: toastLenght,
       gravity: ToastGravity.BOTTOM,
       backgroundColor: Colors.red,
       textColor: Colors.white,

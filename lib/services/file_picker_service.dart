@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class FilePickerService with ChangeNotifier {
@@ -30,17 +32,27 @@ class FilePickerService with ChangeNotifier {
           await FilePicker.platform.pickFiles(type: fileType);
 
       if (result != null) {
-        File file = File(result.files.single.path);
-        videoFile = file;
-        videoThumbnailFile = await VideoThumbnail.thumbnailData(
-          video: videoFile.path,
-          imageFormat: ImageFormat.JPEG,
-          maxWidth: 250,
-          maxHeight: 250,
-          quality: 50,
-        );
-        notifyListeners();
-        return true;
+        PlatformFile platformfile = result.files.first;
+        print(platformfile.extension);
+        if (platformfile.extension == 'mp4') {
+          File file = File(result.files.single.path);
+          videoFile = file;
+          videoThumbnailFile = await VideoThumbnail.thumbnailData(
+            video: videoFile.path,
+            imageFormat: ImageFormat.JPEG,
+            maxWidth: 250,
+            maxHeight: 250,
+            quality: 50,
+          );
+          notifyListeners();
+          return true;
+        } else {
+          Methods.showToast(
+            toastLenght: Toast.LENGTH_LONG,
+            message:
+                "Please select mp4 file or convert your file to mp4 formate",
+          );
+        }
       }
       return false;
     } catch (e) {
