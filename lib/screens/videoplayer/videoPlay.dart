@@ -113,7 +113,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   isDownloaded() async {
     var contain = Constant.listOfDownloadedFiles
-        .where((element) => element.mp4Url == videoModel.mp4URL);
+        .where((element) => element.mp4Url == videoModel.videoURL);
     if (contain.isNotEmpty) downloaded = true;
 
     final hasPermission = Platform.isAndroid
@@ -136,12 +136,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         }
 
         var contain = Constant.listOfDownloadedFiles
-            .where((element) => element.mp4Url == videoModel.mp4URL);
+            .where((element) => element.mp4Url == videoModel.videoURL);
         if (contain.isEmpty) {
           DatabaseHelper databaseHelper = DatabaseHelper();
           //we need fileLocation, fileUrl, time
           DownloadedFile downloadedFile = DownloadedFile(
-            mp4Url: videoModel.mp4URL,
+            mp4Url: videoModel.videoURL,
             fileLocation: loc,
             downloadTime: DateTime.now().toString(),
           );
