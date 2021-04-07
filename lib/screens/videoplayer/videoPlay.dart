@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:jewtubefirestore/enum/downloadstatus.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/sqflite_helper.dart';
 import 'package:jewtubefirestore/model/video.dart';
@@ -48,13 +49,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   Animation<Color> _colorAnimation;
   Color beginColor = Colors.blueGrey;
   Color endColor = Colors.blue[900];
-  bool downloaded = false;
+  // bool downloaded = false;
+  DownloadStatus downloadStatus = DownloadStatus.NOTSTARTED;
 
   //Flutter download
   ReceivePort _port = ReceivePort();
   String fileLocation;
 
-  //download progress
+  //download progress (Show download precentage when click on download button)
   String downloadProgress;
 
   @override
@@ -115,44 +117,70 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   isDownloaded() async {
-    var contain = Constant.listOfDownloadedFiles
-        .where((element) => element.mp4Url == videoModel.videoURL);
-    if (contain.isNotEmpty) downloaded = true;
+    //first check if any download is in progress
+    // final tasks = await FlutterDownloader.loadTasks();
+    // print('tasks: ' + tasks.toString());
+    print('************************');
+    final tasks = await FlutterDownloader.loadTasksWithRawQuery(
+        query: 'SELECT * FROM task WHERE url = "${videoModel.videoURL}"');
+    print(tasks.toString());
+    print('************************');
 
-    final hasPermission = Platform.isAndroid
-        ? await Permission.storage.request().isGranted
-        : true;
+    if (tasks.length != 0 && tasks[0].progress < 100) {
+      downloadStatus = DownloadStatus.INPROGRESS;
+      downloadProgress = tasks[0].progress.toString();
+      //animate download icon
+      beginColor = Colors.green;
+      _colorAnimation = ColorTween(begin: beginColor, end: endColor)
+          .animate(_animationController)
+            ..addListener(() {
+              setState(() {});
+            });
+      _animationController.repeat(reverse: true);
+    } else {
+      //Note: in download class mp4Url = videoURL
+      var contain = Constant.listOfDownloadedFiles
+          .where((element) => element.videoURL == videoModel.videoURL);
+      // if (contain.isNotEmpty) downloaded = true;
+      if (contain.isNotEmpty) downloadStatus = DownloadStatus.DOWNLOADED;
 
-    if (hasPermission) {
-      final externalDir = await getDownloadDirectory();
-      print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
-      String loc =
-          '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
-      File videoFile = new File(loc);
-      if (videoFile.existsSync()) {
-        if (mounted) {
-          setState(() {
-            downloaded = true;
-          });
-        } else {
-          downloaded = true;
-        }
+      final hasPermission = Platform.isAndroid
+          ? await Permission.storage.request().isGranted
+          : true;
 
-        var contain = Constant.listOfDownloadedFiles
-            .where((element) => element.mp4Url == videoModel.videoURL);
-        if (contain.isEmpty) {
-          DatabaseHelper databaseHelper = DatabaseHelper();
-          //we need fileLocation, fileUrl, time
-          DownloadedFile downloadedFile = DownloadedFile(
-            mp4Url: videoModel.videoURL,
-            fileLocation: loc,
-            downloadTime: DateTime.now().toString(),
-          );
-          int result =
-              await databaseHelper.insertFile(downloadedFile: downloadedFile);
-          if (result != 0) {
-            //update DownloadedFilesList (inside Resourse class)
-            Methods.loadDownloadedFilesList();
+      if (hasPermission) {
+        final externalDir = await getDownloadDirectory();
+        print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
+        String loc =
+            '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
+        File videoFile = new File(loc);
+        if (videoFile.existsSync()) {
+          if (mounted) {
+            setState(() {
+              // downloaded = true;
+              downloadStatus = DownloadStatus.DOWNLOADED;
+            });
+          } else {
+            // downloaded = true;
+            downloadStatus = DownloadStatus.NOTSTARTED;
+          }
+
+          var contain = Constant.listOfDownloadedFiles
+              .where((element) => element.videoURL == videoModel.videoURL);
+          if (contain.isEmpty) {
+            DatabaseHelper databaseHelper = DatabaseHelper();
+            //we need fileLocation, fileUrl, time
+            DownloadedFile downloadedFile = DownloadedFile(
+              videoURL: videoModel.videoURL,
+              fileLocation: loc,
+              downloadTime: DateTime.now().toString(),
+            );
+            int result =
+                await databaseHelper.insertFile(downloadedFile: downloadedFile);
+            if (result != 0) {
+              //update DownloadedFilesList (inside Resourse class)
+              Methods.loadDownloadedFilesList();
+            }
           }
         }
       }
@@ -175,24 +203,39 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         return;
       }
       _port.listen((dynamic data) async {
-        print('Data: ' + data.toString());
-        print('Data: ' + data[2].toString());
-        downloadProgress = data[2].toString();
-        String id = data[0];
+        // print('Data: ' + data.toString());
+        // print('Data: ' + data[2].toString());
+        // downloadProgress = data[2].toString();
+        // String id = data[0];
         DownloadTaskStatus status = data[1];
-        print('status: ' + status.toString());
+        //
+        print('*******************');
+        final alltasks = await FlutterDownloader.loadTasks();
+        print('alltasks: ' + alltasks.toString());
+        print('*******************');
+        //
+        final tasks = await FlutterDownloader.loadTasksWithRawQuery(
+            query: 'SELECT * FROM task WHERE url = "${videoModel.videoURL}"');
+        print(tasks.toString());
+        downloadProgress = tasks[0].progress.toString();
+        //
 
         if (status == DownloadTaskStatus.complete) {
+          //when completed done then get file location
+          final externalDir = await getDownloadDirectory();
+          fileLocation =
+              '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
           print("completed");
           _animationController.stop();
           setState(() {
-            downloaded = true;
+            // downloaded = true;
+            downloadStatus = DownloadStatus.DOWNLOADED;
           });
           //save download data
           DatabaseHelper databaseHelper = DatabaseHelper();
           //we need fileLocation, fileUrl, time
           DownloadedFile downloadedFile = DownloadedFile(
-              mp4Url: videoModel.videoURL,
+              videoURL: videoModel.videoURL,
               // mp4Url: DumyData.videourl2,
               fileLocation: fileLocation,
               downloadTime: DateTime.now().toString());
@@ -284,7 +327,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                               style: TextStyle(color: Colors.black),
                             ),
                             //download icon
-                            downloaded
+                            downloadStatus == DownloadStatus.DOWNLOADED
                                 ? IconButton(
                                     onPressed: () => downloadFile(),
                                     color: Colors.blueGrey,
@@ -360,10 +403,15 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   Future<void> downloadFile() async {
-    if (!downloaded) {
-      if (!Constant.downloadingVideosList.contains(videoModel)) {
-        Constant.downloadingVideosList.add(videoModel);
-      }
+    print(downloadStatus.toString());
+    if (downloadStatus != DownloadStatus.DOWNLOADED &&
+        downloadStatus != DownloadStatus.INPROGRESS) {
+      //update downloadstatus
+      downloadStatus = DownloadStatus.INPROGRESS;
+
+      // if (!Constant.downloadingVideosList.contains(videoModel)) {
+      //   Constant.downloadingVideosList.add(videoModel);
+      // }
       beginColor = Colors.green;
       _colorAnimation = ColorTween(begin: beginColor, end: endColor)
           .animate(_animationController)
@@ -377,9 +425,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
       if (hasPermission) {
         final externalDir = await getDownloadDirectory();
-        print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
-        fileLocation =
-            '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
+        // print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
+        // fileLocation =
+        //     '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
         final id = await FlutterDownloader.enqueue(
           url: videoModel.videoURL,
           // url: DumyData.videourl3,
@@ -395,7 +443,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         print("Permission Denied");
       }
     } else {
-      Methods.showToast(message: "Already Downloaded");
+      if (downloadStatus == DownloadStatus.DOWNLOADED)
+        Methods.showToast(message: "Already Downloaded");
+      else
+        Methods.showToast(message: "Download is already in progress");
     }
   }
 }

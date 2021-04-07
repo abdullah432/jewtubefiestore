@@ -2,13 +2,13 @@ import 'package:meta/meta.dart';
 
 class DownloadedFile {
   int id;
-  String mp4Url;
+  String videoURL;
   String fileLocation;
   String downloadTime;
 
   DownloadedFile({
     @required this.fileLocation,
-    @required this.mp4Url,
+    @required this.videoURL,
     @required this.downloadTime,
   });
 
@@ -18,7 +18,7 @@ class DownloadedFile {
   Map<String, dynamic> toMap() {
     var map = Map<String, dynamic>();
 
-    map['url'] = mp4Url;
+    map['url'] = videoURL;
     map['location'] = fileLocation;
     map['time'] = downloadTime;
 
@@ -30,11 +30,11 @@ class DownloadedFile {
     id = map['id'];
     fileLocation = map['location'];
     downloadTime = map['time'];
-    mp4Url = map['url'];
+    videoURL = map['url'];
   }
 
   @override
   String toString() {
-    return 'id: $id   fileLocation: $fileLocation   filePath: $mp4Url   time: $downloadTime';
+    return 'id: $id   fileLocation: $fileLocation   filePath: $videoURL   time: $downloadTime';
   }
 }

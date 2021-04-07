@@ -1,0 +1,1 @@
+enum DownloadStatus { NOTSTARTED, INPROGRESS, DOWNLOADED }

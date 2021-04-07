@@ -63,8 +63,8 @@ class _OfflineVideoPlayerState extends State<OfflineVideoPlayer>
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController.dispose();
+    _videoPlayerController?.dispose();
+    _chewieController?.dispose();
     super.dispose();
   }
 

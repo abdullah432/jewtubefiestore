@@ -55,7 +55,6 @@ class Methods {
   static Future<void> loadDownloadedFilesList() async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
-    Constant.downloadingVideosList = [];
     dbFuture.then((database) {
       Future<List<DownloadedFile>> filesListFuture =
           databaseHelper.getDownloadedFilesList();

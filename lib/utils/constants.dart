@@ -7,7 +7,7 @@ class Constant {
   static bool isSignedIn = false;
 
   static List<DownloadedFile> listOfDownloadedFiles = [];
-  static List<VideoModel> downloadingVideosList = [];
+  // static List<VideoModel> downloadingVideosList = [];
 
   static final Color unselectedColor = Colors.grey[700];
   static final Color selectedColor = Colors.red;

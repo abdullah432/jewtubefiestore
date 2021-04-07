@@ -29,11 +29,11 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
   @override
   void initState() {
     super.initState();
-    if (Constant.downloadingVideosList.length > 0) {
-      Constant.downloadingVideosList.forEach((videoModel) {
-        isDownloaded(videoModel);
-      });
-    }
+    // if (Constant.downloadingVideosList.length > 0) {
+    //   Constant.downloadingVideosList.forEach((videoModel) {
+    //     isDownloaded(videoModel);
+    //   });
+    // }
   }
 
   isDownloaded(VideoModel videoModel) async {
@@ -53,12 +53,12 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
       File videoFile = new File(loc);
       if (videoFile.existsSync()) {
         var contain = Constant.listOfDownloadedFiles
-            .where((element) => element.mp4Url == videoModel.mp4URL);
+            .where((element) => element.videoURL == videoModel.videoURL);
         if (contain.isEmpty) {
           DatabaseHelper databaseHelper = DatabaseHelper();
           //we need fileLocation, fileUrl, time
           DownloadedFile downloadedFile = DownloadedFile(
-              mp4Url: videoModel.mp4URL,
+              videoURL: videoModel.videoURL,
               fileLocation: loc,
               downloadTime: DateTime.now().toString());
           int result =
