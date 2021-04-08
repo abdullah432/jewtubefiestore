@@ -25,9 +25,12 @@ class ChannelService with ChangeNotifier {
   }
 
   loadSubscribedChannelData(context) async {
+    print('loading started');
     final currentuser = Provider.of<CurrentUser>(context, listen: false);
     subscribedChannelList = await database.loadSubscribedChannelList(
         subscribedTo: currentuser.subscribedTo);
+    print('loading end');
+
     subscribedChannelVideosList.clear();
     //load each channel video one by one
     for (int i = 0; i < subscribedChannelList.length; i++) {
@@ -35,6 +38,7 @@ class ChannelService with ChangeNotifier {
           .loadVideosByChannelID(subscribedChannelList[i].reference.id);
       subscribedChannelVideosList.addAll(videos);
     }
+
     notifyListeners();
   }
 

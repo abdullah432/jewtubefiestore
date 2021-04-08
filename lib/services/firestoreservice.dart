@@ -176,10 +176,21 @@ class FirestoreService with ChangeNotifier {
     return true;
   }
 
-  subscribeToChannel({@required channeluid, @required useruid}) {
-    db.collection("users").doc(useruid).update({
-      'subscribedTo': FieldValue.arrayUnion([channeluid]),
-    });
+  subscribeToChannel({
+    @required channeluid,
+    @required useruid,
+    @required subscriptionstatus,
+  }) {
+    if (subscriptionstatus) {
+      //already subscribed
+      db.collection("users").doc(useruid).update({
+        'subscribedTo': FieldValue.arrayRemove([channeluid]),
+      });
+    } else {
+      db.collection("users").doc(useruid).update({
+        'subscribedTo': FieldValue.arrayUnion([channeluid]),
+      });
+    }
   }
 
   deleteChannel(channeluid) async {

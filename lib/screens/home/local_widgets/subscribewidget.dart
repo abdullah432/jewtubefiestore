@@ -20,7 +20,7 @@ class SubscribeWidget extends StatefulWidget {
 
 class _SubscribeWidgetState extends State<SubscribeWidget> {
   Color clr = Colors.blueGrey;
-  bool status = false;
+  bool subscriptionstatus = false;
   CurrentUser currentuser;
 
   @override
@@ -32,8 +32,8 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
   Widget build(BuildContext context) {
     currentuser = Provider.of<CurrentUser>(context, listen: false);
     if (Constant.isSignedIn)
-      status = currentuser.subscribedTo.contains(widget.channelID);
-    if (status) {
+      subscriptionstatus = currentuser.subscribedTo.contains(widget.channelID);
+    if (subscriptionstatus) {
       clr = Colors.grey;
     } else {
       clr = Colors.red;
@@ -46,9 +46,12 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
             database.subscribeToChannel(
               channeluid: widget.channelID,
               useruid: currentuser.reference.id,
+              subscriptionstatus: subscriptionstatus,
             );
-
-            currentuser.subscribedTo.add(widget.channelID);
+            if (subscriptionstatus)
+              currentuser.subscribedTo.remove(widget.channelID);
+            else
+              currentuser.subscribedTo.add(widget.channelID);
 
             setState(() {});
           } else {
@@ -70,7 +73,7 @@ class _SubscribeWidgetState extends State<SubscribeWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              status ? "SUBSCRIBED" : "SUBSCRIBE",
+              subscriptionstatus ? "SUBSCRIBED" : "SUBSCRIBE",
               style: TextStyle(color: clr, fontSize: 12),
             ),
           ],

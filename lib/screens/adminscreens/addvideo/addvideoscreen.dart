@@ -207,7 +207,7 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                                       onTap: () async {
                                         bool result = await filepickerservice
                                             .pickVideoFileForUpload(
-                                          fileType: FileType.video,
+                                          fileType: FileType.any,
                                         );
                                         if (result) {
                                           videofile =

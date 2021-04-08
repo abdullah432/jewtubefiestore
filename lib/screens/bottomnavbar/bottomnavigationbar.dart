@@ -222,6 +222,7 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
                 // print('signout');
                 // await locator<NavigationService>().navigateTo(LoginRoute);
                 Constant.isSignedIn = false;
+                Constant.isAdmin = false;
                 setState(() {});
               },
             )
