@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:jewtubefirestore/model/channel.dart';
 import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
@@ -26,7 +27,6 @@ class AddVideoScreen extends StatefulWidget {
 }
 
 class _AddVideoScreenState extends State<AddVideoScreen> {
-  double _progressValue = 0;
   FocusNode _focusNode = new FocusNode();
   bool isFileUploading = false;
   bool _titleEditEnable = true;
@@ -41,12 +41,13 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
     'Music',
     'Movies'
   ];
-
+  List<String> listOfLanguages = ['English', 'French', 'Spanish'];
   String selectedCategory;
+  String selectedLanguage;
+  //for video durattion
+  final videoInfo = FlutterVideoInfo();
 
   void uploadVideo(BuildContext context) async {
-    String result;
-
     if (videofile == null) {
       Methods.showToast(message: "No Video Selected");
     } else if (_txtTitle.text == null || _txtTitle.text == "") {
@@ -55,8 +56,14 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
       Methods.showToast(message: "Please select category");
     } else if (thumbFile == null) {
       Methods.showToast(message: "Please select custom thumbnail for video");
+    } else if (selectedLanguage == null) {
+      Methods.showToast(message: "Please select language for this video");
     } else {
       setState(() => isFileUploading = true);
+
+      //get video duration
+      var info = await videoInfo.getVideoInfo(videofile.path);
+      print(info.duration.toString());
 
       Channel channel = widget.channel;
       VideoModel video = VideoModel(
@@ -67,6 +74,8 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
         videoURL: null,
         mp4URL: null,
         thumbNail: null,
+        language: selectedLanguage,
+        videoduration: info.duration,
         isVideoProcessingComplete: false,
         category: selectedCategory,
       );
@@ -89,41 +98,16 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
         print('result: ' + result);
         print('success');
       } catch (e) {
-        print('uploading fialed');
+        print('uploading failed');
         print(e.toString());
       }
       setState(() => isFileUploading = false);
       Navigator.pop(context);
-      // print(Path.basename(videofile.path).toString());
-      // AwsS3 awsS3 = AwsS3(
-      //   awsFolderPath: "TestingFromFirestore",
-      //   file: videofile,
-      //   fileNameWithExt: Path.basename(videofile.path),
-      //   region: Regions.US_WEST_2,
-      //   bucketName: 'jewtube-source-14c5ef0ws4cpc',
-      //   poolId: '',
-      // );
-
-      // setState(() => isFileUploading = true);
-
-      // try {
-      //   try {
-      //     result = await awsS3.uploadFile;
-      //     debugPrint("Result :'$result'.");
-      //   } on PlatformException {
-      //     debugPrint("Result :'$result'.");
-      //   }
-      // } on PlatformException catch (e) {
-      //   debugPrint("Failed :'${e.message}'.");
-      // }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var sysWidth = MediaQuery.of(context).size.width;
-    var sysHeight = MediaQuery.of(context).size.height;
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -166,9 +150,7 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 20,
-                      ),
+                      SizedBox(height: 20),
                       DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           hint: Text('Please choose a category'),
@@ -187,9 +169,27 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                           },
                         ),
                       ),
-                      SizedBox(
-                        height: 30,
+                      //choose language
+                      SizedBox(height: 20),
+                      DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          hint: Text('Please choose a language'),
+                          value: selectedLanguage,
+                          items: listOfLanguages.map((String value) {
+                            return new DropdownMenuItem<String>(
+                              value: value,
+                              child: new Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            print(value);
+                            setState(() {
+                              selectedLanguage = value;
+                            });
+                          },
+                        ),
                       ),
+                      SizedBox(height: 30),
                       Consumer<FilePickerService>(
                         builder: (context, filepickerservice, child) {
                           return Row(
@@ -316,45 +316,6 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                   ),
                 ),
               ),
-      ),
-    );
-  }
-}
-
-class _AnimatedLiquidLinearProgressIndicator extends StatefulWidget {
-  _AnimatedLiquidLinearProgressIndicator(this.value);
-
-  double value;
-
-  @override
-  State<StatefulWidget> createState() =>
-      _AnimatedLiquidLinearProgressIndicatorState();
-}
-
-class _AnimatedLiquidLinearProgressIndicatorState
-    extends State<_AnimatedLiquidLinearProgressIndicator>
-    with SingleTickerProviderStateMixin {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.65,
-        height: 75.0,
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
-        child: LiquidLinearProgressIndicator(
-          value: widget.value,
-          backgroundColor: Colors.white,
-          valueColor: AlwaysStoppedAnimation(Colors.blue),
-          borderRadius: 12.0,
-          center: Text(
-            "${(widget.value * 100).toStringAsFixed(0)}%",
-            style: TextStyle(
-              color: Colors.lightBlueAccent,
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
       ),
     );
   }

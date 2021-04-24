@@ -3,6 +3,7 @@ import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/screens/home/local_widgets/subscribewidget.dart';
 import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:jewtubefirestore/utils/methods.dart';
 
 class VideoItemWidget extends StatefulWidget {
   final VideoModel video;
@@ -38,22 +39,49 @@ class _VideoItemWidgetState extends State<VideoItemWidget> {
       margin: EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: <Widget>[
-          //thumbnail
-          GestureDetector(
-            child: CachedNetworkImage(
-              fit: BoxFit.cover,
-              height: 200,
-              width: width,
-              imageUrl: widget.video.thumbNail,
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Center(
-                child: CircularProgressIndicator(
-                  value: downloadProgress.progress,
+          Stack(
+            children: [
+              //thumbnail
+              GestureDetector(
+                child: CachedNetworkImage(
+                  fit: BoxFit.cover,
+                  height: 200,
+                  width: width,
+                  imageUrl: widget.video.thumbNail,
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Center(
+                    child: CircularProgressIndicator(
+                      value: downloadProgress.progress,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
+                onTap: widget.onPlay,
               ),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
-            onTap: widget.onPlay,
+
+              //Video Duration
+              Positioned(
+                bottom: 0.0,
+                right: 0.0,
+                child: widget.video.videoduration != null
+                    ? Container(
+                        color: Colors.black,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8.0, right: 8.0, top: 5.0, bottom: 5.0),
+                          child: Text(
+                            Methods.millisecondsToHMS(
+                                widget.video.videoduration),
+                            // Methods.timeToString(
+                            //     widget.video.videoduration.toInt()),
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 12.0),
+                          ),
+                        ),
+                      )
+                    : Container(width: 0, height: 0),
+              ),
+            ],
           ),
           //Row below thumbnail: include circular icon, videotitle and description
           videoBottomView()

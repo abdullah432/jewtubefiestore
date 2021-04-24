@@ -11,6 +11,8 @@ class VideoModel {
   String thumbNail;
   String customThumb;
   String category;
+  String language;
+  double videoduration;
   DateTime uploadTime;
   bool isVideoProcessingComplete;
   DocumentReference reference;
@@ -23,6 +25,8 @@ class VideoModel {
     @required this.videoURL,
     @required this.mp4URL,
     @required this.category,
+    @required this.language,
+    @required this.videoduration,
     this.uploadTime,
     this.thumbNail,
     this.isVideoProcessingComplete,
@@ -37,6 +41,8 @@ class VideoModel {
       'videoURL': videoURL,
       'mp4URL': mp4URL,
       'category': category,
+      'language': language,
+      'videoduration': videoduration,
       'thumbNail': thumbNail,
       'customThumb': customThumb,
       'uploadTime': DateTime.now(),
@@ -53,28 +59,12 @@ class VideoModel {
         mp4URL = map['mp4URL'],
         category = map['category'],
         isVideoProcessingComplete = map['isVideoProcessingComplete'],
+        language = map['language'] != null ? map['language'] : 'English',
+        videoduration =
+            map['videoduration'] != null ? map['videoduration'] : null,
         thumbNail =
             map['customThumb'] != null ? map['customThumb'] : map['thumbNail'];
 
   VideoModel.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data(), reference: snapshot.reference);
-
-  // factory VideoModel.fromJson(
-  //     {@required Map<String, dynamic> json, @required subArray}) {
-  //   return VideoModel(
-  //     channelID: json['channelID'],
-  //     channelName: json['channelName'],
-  //     channelImage: json['channelImage'],
-  //     videoTitle: json['videoTitle'],
-  //     videoURL: json['videoURL'],
-  //     mp4URL: json['mp4URL'],
-  //     videoId: json['videoID'],
-  //     thumbNail:
-  //         json['customThumb'] != null ? json['customThumb'] : json['thumbNail'],
-  //     sub: json['channelID'] == "" || subArray == null || subArray.length == 0
-  //         ? false
-  //         : subArray.contains(json['channelID']),
-  //     videoUuid: json['videoUUID'],
-  //   );
-  // }
 }

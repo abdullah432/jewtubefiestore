@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:flutter_ffmpeg/media_information.dart';
 import 'package:jewtubefirestore/enum/content_type.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/sqflite_helper.dart';
@@ -15,6 +17,10 @@ import 'package:sqflite/sqflite.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class Methods {
+  static final FlutterFFprobe _flutterFFprobe = new FlutterFFprobe();
+  static final FlutterFFmpegConfig _flutterFFmpegConfig =
+      new FlutterFFmpegConfig();
+
   static showSnackbar({@required scafoldKey, @required message}) {
     scafoldKey.currentState.showSnackBar(SnackBar(content: new Text(message)));
   }
@@ -100,5 +106,77 @@ class Methods {
     // if (contenttype.split("/")[0] == 'image/png' ||
     //     contenttype.split("/")[0] == 'image/jpeg') return ContentType.IMAGE;
     return ContentType.IMAGE;
+  }
+
+  int parseTimeString(String string, {int currentLayer = 0}) {
+    if ((string?.length ?? 0) == 0) return 0;
+    String splitString = currentLayer == 0 ? "." : ":";
+    String substring = string.substring(string.lastIndexOf(splitString) + 1);
+    if (currentLayer == 0) {
+      while (substring.length < 3) {
+        substring += "0";
+      }
+    }
+    int parsed = int.tryParse(substring) ?? 0;
+    Duration duration;
+    switch (currentLayer) {
+      case 0:
+        duration = Duration(milliseconds: parsed);
+        break;
+      case 1:
+        duration = Duration(seconds: parsed);
+        break;
+      case 2:
+        duration = Duration(minutes: parsed);
+        break;
+      case 3:
+        duration = Duration(hours: parsed);
+        break;
+    }
+    return duration.inMilliseconds +
+        parseTimeString(
+            string.substring(
+                0,
+                string.lastIndexOf(splitString) == -1
+                    ? 0
+                    : string.lastIndexOf(splitString)),
+            currentLayer: currentLayer + 1);
+  }
+
+  static String timeToString(int millis) {
+    print('miliseconds: ' + millis.toString());
+    Duration duration = Duration(milliseconds: millis);
+    String result = duration.toString();
+    while (result.substring(result.length - 1) == "0") {
+      result = result.substring(0, result.length - 1);
+    }
+    if (result.substring(result.length - 1) == ".") result += "0";
+    return result;
+  }
+
+  static String millisecondsToHMS(double milliseconds) {
+    Duration duration = Duration(milliseconds: milliseconds.toInt());
+
+    var seconds = duration.inSeconds;
+    final days = seconds ~/ Duration.secondsPerDay;
+    seconds -= days * Duration.secondsPerDay;
+    final hours = seconds ~/ Duration.secondsPerHour;
+    seconds -= hours * Duration.secondsPerHour;
+    final minutes = seconds ~/ Duration.secondsPerMinute;
+    seconds -= minutes * Duration.secondsPerMinute;
+
+    final List<String> tokens = [];
+    if (days != 0) {
+      tokens.add('$days');
+    }
+    if (tokens.isNotEmpty || hours != 0) {
+      tokens.add('$hours');
+    }
+    if (tokens.isNotEmpty || minutes != 0) {
+      tokens.add('$minutes');
+    }
+    tokens.add('$seconds');
+
+    return tokens.join(':');
   }
 }
