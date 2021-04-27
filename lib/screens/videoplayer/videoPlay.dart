@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:jewtubefirestore/enum/downloadstatus.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/sqflite_helper.dart';
@@ -58,6 +59,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   //download progress (Show download precentage when click on download button)
   String downloadProgress;
+  //
+  double deviceRatio;
 
   @override
   void initState() {
@@ -85,10 +88,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   Future<void> initVideoPlayer() async {
     await _videoPlayerController.initialize();
 
-    print(_videoPlayerController.value.aspectRatio);
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       aspectRatio: _videoPlayerController.value.aspectRatio,
+      // aspectRatio: deviceRatio,
+      allowFullScreen: false,
       autoPlay: false,
       looping: false,
     );
@@ -272,6 +276,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    deviceRatio = size.width / size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text(''),

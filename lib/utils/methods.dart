@@ -1,10 +1,7 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
-import 'package:flutter_ffmpeg/media_information.dart';
 import 'package:jewtubefirestore/enum/content_type.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/sqflite_helper.dart';
@@ -17,10 +14,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class Methods {
-  static final FlutterFFprobe _flutterFFprobe = new FlutterFFprobe();
-  static final FlutterFFmpegConfig _flutterFFmpegConfig =
-      new FlutterFFmpegConfig();
-
   static showSnackbar({@required scafoldKey, @required message}) {
     scafoldKey.currentState.showSnackBar(SnackBar(content: new Text(message)));
   }
@@ -166,17 +159,26 @@ class Methods {
     seconds -= minutes * Duration.secondsPerMinute;
 
     final List<String> tokens = [];
-    if (days != 0) {
-      tokens.add('$days');
-    }
-    if (tokens.isNotEmpty || hours != 0) {
-      tokens.add('$hours');
-    }
-    if (tokens.isNotEmpty || minutes != 0) {
-      tokens.add('$minutes');
-    }
-    tokens.add('$seconds');
+    if (days == 0 && hours == 0 && minutes == 0) {
+      if (seconds < 10) {
+        tokens.add('0:0$seconds');
+      } else {
+        tokens.add('0:$seconds');
+      }
+      return tokens.join(':');
+    } else {
+      if (days != 0) {
+        tokens.add('$days');
+      }
+      if (tokens.isNotEmpty || hours != 0) {
+        tokens.add('$hours');
+      }
+      if (tokens.isNotEmpty || minutes != 0) {
+        tokens.add('$minutes');
+      }
+      tokens.add('$seconds');
 
-    return tokens.join(':');
+      return tokens.join(':');
+    }
   }
 }

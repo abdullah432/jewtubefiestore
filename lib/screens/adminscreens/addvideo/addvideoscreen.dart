@@ -2,17 +2,16 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:jewtubefirestore/model/channel.dart';
 import 'package:jewtubefirestore/model/video.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
 import 'package:jewtubefirestore/services/videosService.dart';
+import 'package:jewtubefirestore/utils/constants.dart';
 import 'package:jewtubefirestore/utils/methods.dart';
 import 'package:path/path.dart' as Path;
 import 'package:provider/provider.dart';
-import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:aws_s3_upload/aws_s3_upload.dart';
 
 class AddVideoScreen extends StatefulWidget {
@@ -34,14 +33,6 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
   bool init = false;
   File videofile, thumbFile;
 
-  //category parameters
-  List<String> listOfcategories = [
-    'Daily Dose',
-    'Torah Classes',
-    'Music',
-    'Movies'
-  ];
-  List<String> listOfLanguages = ['English', 'French', 'Spanish'];
   String selectedCategory;
   String selectedLanguage;
   //for video durattion
@@ -63,7 +54,6 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
 
       //get video duration
       var info = await videoInfo.getVideoInfo(videofile.path);
-      print(info.duration.toString());
 
       Channel channel = widget.channel;
       VideoModel video = VideoModel(
@@ -155,7 +145,7 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                         child: DropdownButton<String>(
                           hint: Text('Please choose a category'),
                           value: selectedCategory,
-                          items: listOfcategories.map((String value) {
+                          items: Constant.listOfcategories.map((String value) {
                             return new DropdownMenuItem<String>(
                               value: value,
                               child: new Text(value),
@@ -175,7 +165,7 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                         child: DropdownButton<String>(
                           hint: Text('Please choose a language'),
                           value: selectedLanguage,
-                          items: listOfLanguages.map((String value) {
+                          items: Constant.listOfLanguages.map((String value) {
                             return new DropdownMenuItem<String>(
                               value: value,
                               child: new Text(value),

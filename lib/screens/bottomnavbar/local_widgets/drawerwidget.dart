@@ -31,10 +31,6 @@ class MyDrawer extends StatelessWidget {
                     FlutterIcons.user_faw,
                     size: 70,
                   ),
-                  // CircleAvatar(
-                  //   backgroundImage: AssetImage("assets/account.png"),
-                  //   radius: 70,
-                  // ),
                 ),
                 SizedBox(
                   height: 20,
@@ -48,18 +44,18 @@ class MyDrawer extends StatelessWidget {
                 SizedBox(
                   height: 20,
                 ),
-                Divider(
-                  thickness: 5,
-                  color: dividerColor,
-                ),
-                ListTile(
-                  title: Text("Show All Videos"),
-                  onTap: () {
-                    // scaffoldKey.currentState.openEndDrawer();
-                    // Resources.navigationKey.currentState
-                    //     .pushNamed('/admin_all_videos');
-                  },
-                ),
+                // Divider(
+                //   thickness: 5,
+                //   color: dividerColor,
+                // ),
+                // ListTile(
+                //   title: Text("Show All Videos"),
+                //   onTap: () {
+                //     // scaffoldKey.currentState.openEndDrawer();
+                //     // Resources.navigationKey.currentState
+                //     //     .pushNamed('/admin_all_videos');
+                //   },
+                // ),
                 Divider(
                   thickness: 5,
                   color: dividerColor,

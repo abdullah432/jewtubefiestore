@@ -33,9 +33,14 @@ class ChannelService with ChangeNotifier {
 
     subscribedChannelVideosList.clear();
     //load each channel video one by one
+    List<VideoModel> videos;
     for (int i = 0; i < subscribedChannelList.length; i++) {
-      List<VideoModel> videos = await database
-          .loadVideosByChannelID(subscribedChannelList[i].reference.id);
+      try {
+        videos = await database
+            .loadVideosByChannelID(subscribedChannelList[i].reference.id);
+      } catch (e) {
+        print(e.toString());
+      }
       subscribedChannelVideosList.addAll(videos);
     }
 

@@ -51,14 +51,16 @@ class VideoModel {
   }
 
   VideoModel.fromMap(Map<String, dynamic> map, {this.reference})
-      : channelID = map['channelID'],
-        channelName = map['channelName'],
-        channelImage = map['channelImage'],
-        videoTitle = map['videoTitle'],
-        videoURL = map['videoURL'],
-        mp4URL = map['mp4URL'],
-        category = map['category'],
-        isVideoProcessingComplete = map['isVideoProcessingComplete'],
+      : channelID = map['channelID'] != null ? map['channelID'] : null,
+        channelName = map['channelName'] != null ? map['channelName'] : null,
+        channelImage = map['channelImage'] != null ? map['channelImage'] : null,
+        videoTitle = map['videoTitle'] != null ? map['videoTitle'] : null,
+        videoURL = map['videoURL'] != null ? map['videoURL'] : null,
+        mp4URL = map['mp4URL'] != null ? map['mp4URL'] : null,
+        category = map['category'] != null ? map['category'] : null,
+        isVideoProcessingComplete = map['isVideoProcessingComplete'] != null
+            ? map['isVideoProcessingComplete']
+            : null,
         language = map['language'] != null ? map['language'] : 'English',
         videoduration =
             map['videoduration'] != null ? map['videoduration'] : null,

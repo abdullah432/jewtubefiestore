@@ -13,17 +13,12 @@ class Channel {
   DocumentReference reference;
 
   Map<String, dynamic> toMap() {
-    return {
-      'channelname': channelName,
-      'profileurl': profileurl,
-      'subscriberlist': [],
-    };
+    return {'channelname': channelName, 'profileurl': profileurl};
   }
 
   Channel.fromMap(Map<String, dynamic> map, {this.reference})
       : channelName = map['channelname'],
-        profileurl = map['profileurl'],
-        subscriberlist = List.from(map['subscriberlist']);
+        profileurl = map['profileurl'];
 
   Channel.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data(), reference: snapshot.reference);

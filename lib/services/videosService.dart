@@ -14,10 +14,23 @@ class VideosService with ChangeNotifier {
   bool channelVideoLoading = true;
   bool isUploading = false;
   int selectedCategoryIndex = 0;
+  int selectedLanguageIndex = 0;
 
   loadAllVideos(context) async {
     final database = Provider.of<FirestoreService>(context, listen: false);
     videosList = await database.loadAllVideos();
+    notifyListeners();
+  }
+
+  filterVideosByLanugage(context, {@required int languageIndex}) async {
+    selectedLanguageIndex = languageIndex;
+    String language;
+    final database = Provider.of<FirestoreService>(context, listen: false);
+    if (languageIndex == 0)
+      language = 'All';
+    else
+      language = Constant.listOfLanguages[languageIndex - 1];
+    videosList = await database.filterVideosByLanugage(language);
     notifyListeners();
   }
 

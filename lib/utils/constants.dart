@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
-import 'package:jewtubefirestore/model/video.dart';
 
 class Constant {
   static bool isAdmin = false;
@@ -18,4 +17,6 @@ class Constant {
     'Movies',
     'Music',
   ];
+
+  static List<String> listOfLanguages = ['English', 'French', 'Spanish'];
 }

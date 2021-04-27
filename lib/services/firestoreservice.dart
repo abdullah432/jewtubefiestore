@@ -62,19 +62,44 @@ class FirestoreService with ChangeNotifier {
     return videolist;
   }
 
-  Future<List<VideoModel>> loadVideosByChannelID(String channelID) async {
-    final ref = db.collection("videos");
-    var snapshot = await ref
-        .where(
-          'channelID',
-          isEqualTo: channelID,
-        )
-        .orderBy('uploadTime', descending: true)
-        .get();
-    final List<VideoModel> videolist = snapshot.docs
+  Future<List<VideoModel>> filterVideosByLanugage(String language) async {
+    Query ref;
+    print(language.toString());
+    if (language.toUpperCase() == 'ALL') {
+      ref = db.collection("videos").orderBy('uploadTime', descending: true);
+    } else {
+      ref = db
+          .collection("videos")
+          .where('language', isEqualTo: language)
+          .orderBy('uploadTime', descending: true);
+    }
+
+    var snapshot = await ref.get();
+    List<VideoModel> videolist = snapshot.docs
         .map((snapshot) => VideoModel.fromSnapshot(snapshot))
         .toList();
     return videolist;
+  }
+
+  Future<List<VideoModel>> loadVideosByChannelID(String channelID) async {
+    try {
+      print('loading videos ');
+      final ref = db.collection("videos");
+      var snapshot = await ref
+          .where(
+            'channelID',
+            isEqualTo: channelID,
+          )
+          .orderBy('uploadTime', descending: true)
+          .get();
+      print(ref.toString());
+      final List<VideoModel> videolist = snapshot.docs
+          .map((snapshot) => VideoModel.fromSnapshot(snapshot))
+          .toList();
+      return videolist;
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<List<VideoModel>> searchVideos(String queryText) async {
@@ -148,24 +173,23 @@ class FirestoreService with ChangeNotifier {
   }
 
   Future<List<Channel>> loadSubscribedChannelList({subscribedTo}) async {
-    try {
-      final authService = FirebaseAuthService();
-      List<Channel> subscribedChannelsList = [];
-      if (authService.isUserLoggedIn()) {
-        for (int i = 0; i < subscribedTo.length; i++) {
-          var snapshot =
-              await db.collection('channels').doc(subscribedTo[i]).get();
-          subscribedChannelsList.add(Channel.fromSnapshot(snapshot));
-        }
+    List<Channel> subscribedChannelsList = [];
+    final authService = FirebaseAuthService();
 
-        return subscribedChannelsList;
-      } else {
-        print('isUserLoggedIn: false');
-        return [];
+    if (authService.isUserLoggedIn()) {
+      for (int i = 0; i < subscribedTo.length; i++) {
+        var snapshot;
+        try {
+          snapshot = await db.collection('channels').doc(subscribedTo[i]).get();
+          subscribedChannelsList.add(Channel.fromSnapshot(snapshot));
+        } catch (e) {
+          print(e.toString());
+        }
       }
-    } catch (e) {
-      print('error');
-      print(e.toString());
+
+      return subscribedChannelsList;
+    } else {
+      print('isUserLoggedIn: false');
       return [];
     }
   }
