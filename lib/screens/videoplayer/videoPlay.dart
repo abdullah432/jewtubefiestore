@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:jewtubefirestore/enum/downloadstatus.dart';
@@ -61,6 +62,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   String downloadProgress;
   //
   double deviceRatio;
+  bool videoStreched = false;
 
   @override
   void initState() {
@@ -87,12 +89,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   Future<void> initVideoPlayer() async {
     await _videoPlayerController.initialize();
-
+    print('SystemUiOverlay.values: ');
+    print(SystemUiOverlay.values.toString());
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       aspectRatio: _videoPlayerController.value.aspectRatio,
-      // aspectRatio: deviceRatio,
-      allowFullScreen: false,
+      showControls: true,
+      systemOverlaysAfterFullScreen: null,
       autoPlay: false,
       looping: false,
     );
@@ -276,8 +279,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   @override
   Widget build(BuildContext context) {
+    var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     final size = MediaQuery.of(context).size;
-    deviceRatio = size.width / size.height;
+    // print('isPortrait: ' + isPortrait.toString());
+    // print('_chewieController: ' + _chewieController.toString());
+    deviceRatio =
+        isPortrait ? (size.height / size.width) : (size.width / size.height);
+    // if (!isPortrait) _chewieController.enterFullScreen();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(''),
@@ -296,10 +305,47 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
               _videoPlayerController.value.isInitialized
                   ? AspectRatio(
                       aspectRatio: _videoPlayerController.value.aspectRatio,
-                      child: Chewie(
-                        controller: _chewieController,
-                      ),
-                    )
+                      child: Stack(children: [
+                        Chewie(
+                          controller: _chewieController,
+                        ),
+                        // Positioned(
+                        //   top: 25,
+                        //   left: 170,
+                        //   child: GestureDetector(
+                        //     onTap: () {
+                        //       // toggleScreenOrientation();
+                        //       // _chewieController = ChewieController(
+                        //       //   videoPlayerController: _videoPlayerController,
+                        //       //   // aspectRatio:
+                        //       //   //     _videoPlayerController.value.aspectRatio,
+                        //       //   fullScreenByDefault: true,
+                        //       //   aspectRatio: deviceRatio,
+                        //       //   autoPlay: false,
+                        //       //   looping: false,
+                        //       // );
+                        //       setState(() {});
+                        //     },
+                        //     child: Container(
+                        //       decoration: BoxDecoration(
+                        //           color: Color(0xff696969),
+                        //           borderRadius: BorderRadius.circular(10)),
+                        //       child: Padding(
+                        //         padding: const EdgeInsets.only(
+                        //             left: 12.0,
+                        //             right: 12.0,
+                        //             bottom: 7.0,
+                        //             top: 7.0),
+                        //         child: Icon(
+                        //           Icons.expand,
+                        //           size: 16,
+                        //           color: Colors.white54,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                      ]))
                   : Container(
                       height: 320,
                       child: Center(child: CircularProgressIndicator()),
@@ -454,5 +500,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       else
         Methods.showToast(message: "Download is already in progress");
     }
+  }
+
+  void toggleScreenOrientation() {
+    if (MediaQuery.of(context).orientation == Orientation.portrait)
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.landscapeLeft,
+      ]);
+    else
+      SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   }
 }

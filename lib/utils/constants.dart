@@ -18,5 +18,5 @@ class Constant {
     'Music',
   ];
 
-  static List<String> listOfLanguages = ['English', 'French', 'Spanish'];
+  static List<String> listOfLanguages = ['English', 'Hebrew', 'Spanish'];
 }

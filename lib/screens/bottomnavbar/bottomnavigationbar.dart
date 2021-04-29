@@ -163,7 +163,7 @@ class _MyBottomNavBarPageState extends State<MyBottomNavBarPage> {
                 InkWell(
                   onTap: () {},
                   child: Image.asset(
-                    "assets/logo.png",
+                    "assets/transparentlogo.png",
                     width: 35,
                   ),
                 ),

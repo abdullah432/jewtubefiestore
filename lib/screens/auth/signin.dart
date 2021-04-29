@@ -159,7 +159,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   ? _height / 30
                   : (_medium ? _height / 25 : _height / 20)),
           child: Image.asset(
-            'assets/logo.png',
+            'assets/transparentlogo.png',
             height: _height / 3.5,
             width: _width / 3.5,
           ),
