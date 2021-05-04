@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:jewtubefirestore/screens/auth/auth_widget.dart';
-import 'package:jewtubefirestore/screens/bottomnavbar/bottomnavigationbar.dart';
 import 'package:jewtubefirestore/services/file_picker_service.dart';
 import 'package:jewtubefirestore/services/firebase_auth_service.dart';
 import 'package:jewtubefirestore/services/firestoreservice.dart';
@@ -20,12 +20,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  await FlutterDownloader.initialize(
-      debug: true // optional: set false to disable printing logs to console
-      );
-  //start loading list of downloaded files
-  //function is written in 'package:jewtube/util/utils.dart'
-  Methods.loadDownloadedFilesList();
+  if ((defaultTargetPlatform == TargetPlatform.iOS) ||
+      (defaultTargetPlatform == TargetPlatform.android)) {
+    await FlutterDownloader.initialize(
+        debug: true // optional: set false to disable printing logs to console
+        );
+    //start loading list of downloaded files
+    //function is written in 'package:jewtube/util/utils.dart'
+    Methods.loadDownloadedFilesList();
+  }
   setupLocator();
   runApp(MyApp());
 }

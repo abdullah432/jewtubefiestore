@@ -2,10 +2,12 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:chewie/chewie.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jewtubefirestore/enum/downloadstatus.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
 import 'package:jewtubefirestore/model/sqflite_helper.dart';
@@ -68,9 +70,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   void initState() {
     _videoPlayerController = VideoPlayerController.network(videoModel.videoURL);
     //check if video is downloaded or not
-    isDownloaded();
     super.initState();
-
+    /* Flutter download */
+    if ((defaultTargetPlatform == TargetPlatform.iOS) ||
+        (defaultTargetPlatform == TargetPlatform.android)) {
+      isDownloaded();
+      _bindBackgroundIsolate();
+      FlutterDownloader.registerCallback(downloadCallback);
+    }
     //
     _animationController = AnimationController(
       duration: Duration(seconds: 3),
@@ -82,9 +89,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     //
     initVideoPlayer();
     loadRecommendedVideosList();
-    /* Flutter download */
-    _bindBackgroundIsolate();
-    FlutterDownloader.registerCallback(downloadCallback);
   }
 
   Future<void> initVideoPlayer() async {
@@ -120,6 +124,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     _videoPlayerController?.dispose();
     _chewieController?.dispose();
     _animationController?.dispose();
+
     _unbindBackgroundIsolate();
   }
 
@@ -267,7 +272,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   void _unbindBackgroundIsolate() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    if ((defaultTargetPlatform == TargetPlatform.iOS) ||
+        (defaultTargetPlatform == TargetPlatform.android)) {
+      IsolateNameServer.removePortNameMapping('downloader_send_port');
+    }
   }
 
   static void downloadCallback(
@@ -309,42 +317,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                         Chewie(
                           controller: _chewieController,
                         ),
-                        // Positioned(
-                        //   top: 25,
-                        //   left: 170,
-                        //   child: GestureDetector(
-                        //     onTap: () {
-                        //       // toggleScreenOrientation();
-                        //       // _chewieController = ChewieController(
-                        //       //   videoPlayerController: _videoPlayerController,
-                        //       //   // aspectRatio:
-                        //       //   //     _videoPlayerController.value.aspectRatio,
-                        //       //   fullScreenByDefault: true,
-                        //       //   aspectRatio: deviceRatio,
-                        //       //   autoPlay: false,
-                        //       //   looping: false,
-                        //       // );
-                        //       setState(() {});
-                        //     },
-                        //     child: Container(
-                        //       decoration: BoxDecoration(
-                        //           color: Color(0xff696969),
-                        //           borderRadius: BorderRadius.circular(10)),
-                        //       child: Padding(
-                        //         padding: const EdgeInsets.only(
-                        //             left: 12.0,
-                        //             right: 12.0,
-                        //             bottom: 7.0,
-                        //             top: 7.0),
-                        //         child: Icon(
-                        //           Icons.expand,
-                        //           size: 16,
-                        //           color: Colors.white54,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       ]))
                   : Container(
                       height: 320,
@@ -451,54 +423,67 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   Future<void> shareLink() async {
-    await Methods.shareLink(video: videoModel);
+    if ((defaultTargetPlatform == TargetPlatform.iOS) ||
+        (defaultTargetPlatform == TargetPlatform.android)) {
+      await Methods.shareLink(video: videoModel);
+    } else {
+      Methods.showToast(
+          message: "Share feature is not supported on web",
+          toastLenght: Toast.LENGTH_LONG);
+    }
   }
 
   Future<void> downloadFile() async {
-    print(downloadStatus.toString());
-    if (downloadStatus != DownloadStatus.DOWNLOADED &&
-        downloadStatus != DownloadStatus.INPROGRESS) {
-      //update downloadstatus
-      downloadStatus = DownloadStatus.INPROGRESS;
+    if ((defaultTargetPlatform == TargetPlatform.iOS) ||
+        (defaultTargetPlatform == TargetPlatform.android)) {
+      if (downloadStatus != DownloadStatus.DOWNLOADED &&
+          downloadStatus != DownloadStatus.INPROGRESS) {
+        //update downloadstatus
+        downloadStatus = DownloadStatus.INPROGRESS;
 
-      // if (!Constant.downloadingVideosList.contains(videoModel)) {
-      //   Constant.downloadingVideosList.add(videoModel);
-      // }
-      beginColor = Colors.green;
-      _colorAnimation = ColorTween(begin: beginColor, end: endColor)
-          .animate(_animationController)
-            ..addListener(() {
-              setState(() {});
-            });
-      _animationController.repeat(reverse: true);
-      final hasPermission = Platform.isAndroid
-          ? await Permission.storage.request().isGranted
-          : true;
+        // if (!Constant.downloadingVideosList.contains(videoModel)) {
+        //   Constant.downloadingVideosList.add(videoModel);
+        // }
+        beginColor = Colors.green;
+        _colorAnimation = ColorTween(begin: beginColor, end: endColor)
+            .animate(_animationController)
+              ..addListener(() {
+                setState(() {});
+              });
+        _animationController.repeat(reverse: true);
+        final hasPermission = Platform.isAndroid
+            ? await Permission.storage.request().isGranted
+            : true;
 
-      if (hasPermission) {
-        final externalDir = await getDownloadDirectory();
-        // print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
-        // fileLocation =
-        //     '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
-        final id = await FlutterDownloader.enqueue(
-          url: videoModel.videoURL,
-          // url: DumyData.videourl3,
-          // url: DumyData.exampleProfileUrl,
-          savedDir: externalDir.path,
-          fileName:
-              "${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4",
-          showNotification: true,
-          openFileFromNotification: false,
-        );
-        Methods.showToast(message: "Downloading started.");
+        if (hasPermission) {
+          final externalDir = await getDownloadDirectory();
+          // print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
+          // fileLocation =
+          //     '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
+          final id = await FlutterDownloader.enqueue(
+            url: videoModel.videoURL,
+            // url: DumyData.videourl3,
+            // url: DumyData.exampleProfileUrl,
+            savedDir: externalDir.path,
+            fileName:
+                "${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4",
+            showNotification: true,
+            openFileFromNotification: false,
+          );
+          Methods.showToast(message: "Downloading started.");
+        } else {
+          print("Permission Denied");
+        }
       } else {
-        print("Permission Denied");
+        if (downloadStatus == DownloadStatus.DOWNLOADED)
+          Methods.showToast(message: "Already Downloaded");
+        else
+          Methods.showToast(message: "Download is already in progress");
       }
     } else {
-      if (downloadStatus == DownloadStatus.DOWNLOADED)
-        Methods.showToast(message: "Already Downloaded");
-      else
-        Methods.showToast(message: "Download is already in progress");
+      Methods.showToast(
+          message: "Download is not supported on web",
+          toastLenght: Toast.LENGTH_LONG);
     }
   }
 
