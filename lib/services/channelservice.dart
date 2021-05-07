@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/channel.dart';
 import 'package:jewtubefirestore/model/user.dart';
@@ -50,7 +51,7 @@ class ChannelService with ChangeNotifier {
   Future<void> createChannel(
     context, {
     @required Channel channel,
-    File imagefile,
+    PlatformFile imagefile,
   }) async {
     String downloadUrl;
     if (imagefile != null) {

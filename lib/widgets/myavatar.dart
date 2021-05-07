@@ -1,14 +1,15 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'circularbutton.dart';
 
 class MyAvatar extends StatelessWidget {
-  final File file;
+  final PlatformFile pickedFile;
   final double radius;
   final VoidCallback onTap;
   const MyAvatar({
-    @required this.file,
+    @required this.pickedFile,
     this.radius: 55,
     @required this.onTap,
     Key key,
@@ -16,14 +17,17 @@ class MyAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (file == null) {
+    if (pickedFile == null) {
       return defaultAvatar(context);
     } else {
       return GestureDetector(
         onTap: onTap,
         child: CircleAvatar(
           radius: radius - 10,
-          backgroundImage: FileImage(file),
+          backgroundImage: kIsWeb
+              // ? NetworkImage(pickedFile.path)
+              ? MemoryImage(pickedFile.bytes)
+              : FileImage(File(pickedFile.path)),
         ),
       );
     }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/enum/content_type.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
@@ -15,7 +16,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class Methods {
   static showSnackbar({@required scafoldKey, @required message}) {
-    scafoldKey.currentState.showSnackBar(SnackBar(content: new Text(message)));
+    scafoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
 
   static Future<void> chooseFileFromGallery(BuildContext context,
@@ -30,15 +31,20 @@ class Methods {
   }
 
   static Future<String> uploadAvatarToStorage({
-    @required File file,
+    @required PlatformFile platformfile,
     @required String path,
     @required String contentType,
   }) async {
     try {
       print('uploading to: $path');
       final storageReference = FirebaseStorage.instance.ref().child(path);
-      final uploadTask = storageReference.putFile(
-          file, SettableMetadata(contentType: contentType));
+      UploadTask uploadTask;
+      if (kIsWeb)
+        uploadTask = storageReference.putData(
+            platformfile.bytes, SettableMetadata(contentType: contentType));
+      else
+        uploadTask = storageReference.putFile(File(platformfile.path),
+            SettableMetadata(contentType: contentType));
       await uploadTask.whenComplete(() => null);
 
       // Url used to download file/image

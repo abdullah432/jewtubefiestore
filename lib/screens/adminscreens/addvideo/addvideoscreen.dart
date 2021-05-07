@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
@@ -31,7 +31,7 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
   bool _titleEditEnable = true;
   TextEditingController _txtTitle = TextEditingController();
   bool init = false;
-  File videofile, thumbFile;
+  PlatformFile videofile, thumbFile;
 
   String selectedCategory;
   String selectedLanguage;
@@ -216,12 +216,19 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                                                     .primaryColor,
                                               ),
                                             )
-                                          : Image.memory(
-                                              filepickerservice
-                                                  .videoThumbnailFile,
-                                              height: 200,
-                                              fit: BoxFit.fitWidth,
-                                            ),
+                                          : kIsWeb
+                                              ? Container(
+                                                  height: 200,
+                                                  child: Center(
+                                                      child: Text(
+                                                          'File Selected')),
+                                                )
+                                              : Image.memory(
+                                                  filepickerservice
+                                                      .videoThumbnailFile,
+                                                  height: 200,
+                                                  fit: BoxFit.fitWidth,
+                                                ),
                                     ),
                                   ),
                                 ),
@@ -271,12 +278,16 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                                                 ],
                                               ),
                                             )
-                                          : Image.file(
-                                              filepickerservice
-                                                  .customthumbnailFile,
-                                              height: 200,
-                                              fit: BoxFit.fitWidth,
-                                            ),
+                                          : kIsWeb
+                                              ? Image.memory(filepickerservice
+                                                  .customthumbnailFile.bytes)
+                                              : Image.file(
+                                                  File(filepickerservice
+                                                      .customthumbnailFile
+                                                      .path),
+                                                  height: 200,
+                                                  fit: BoxFit.fitWidth,
+                                                ),
                                     ),
                                   ),
                                 ),

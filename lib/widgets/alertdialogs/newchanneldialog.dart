@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jewtubefirestore/model/channel.dart';
@@ -17,7 +16,7 @@ class CreateNewChannelDialogBox extends StatefulWidget {
 }
 
 class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
-  File profileImageFile;
+  PlatformFile profileImageFile;
   final channelNameController = TextEditingController();
   bool isChannelCreationInPrgoress = false;
   @override
@@ -53,11 +52,11 @@ class _CreateNewChannelDialogBoxState extends State<CreateNewChannelDialogBox> {
           SizedBox(height: 10.0),
           Consumer<FilePickerService>(
             builder: (context, filepicker, child) {
-              profileImageFile = filepicker.pickedFile.file;
+              profileImageFile = filepicker.pickedFile.platformFile;
               // print('path:' + profileImageFile?.path);
 
               return MyAvatar(
-                file: filepicker.pickedFile.file,
+                pickedFile: filepicker.pickedFile.platformFile,
                 onTap: () => Methods.chooseFileFromGallery(context,
                     fileType: FileType.image),
               );
