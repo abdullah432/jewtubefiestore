@@ -68,6 +68,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   @override
   void initState() {
+    print('videouid: ' + videoModel.reference.id);
+    print('video url: ' + videoModel?.videoURL.toString());
     _videoPlayerController = VideoPlayerController.network(videoModel.videoURL);
     //check if video is downloaded or not
     super.initState();
@@ -437,7 +439,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     if ((defaultTargetPlatform == TargetPlatform.iOS) ||
         (defaultTargetPlatform == TargetPlatform.android)) {
       if (downloadStatus != DownloadStatus.DOWNLOADED &&
-          downloadStatus != DownloadStatus.INPROGRESS) {
+          downloadStatus != DownloadStatus.INPROGRESS &&
+          _videoPlayerController != null) {
         //update downloadstatus
         downloadStatus = DownloadStatus.INPROGRESS;
 

@@ -116,6 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: VideoItemWidget(
                               video: _videoList[index],
                               onPlay: () {
+                                print('videouid: ' +
+                                    _videoList[index].reference.id);
                                 Methods.navigateToPage(
                                   context,
                                   VideoPlayerScreen(

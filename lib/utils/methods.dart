@@ -148,6 +148,9 @@ class Methods {
   }
 
   static String millisecondsToHMS(double milliseconds) {
+    print(milliseconds.toString());
+
+    // milliseconds = 364192.0;
     Duration duration = Duration(milliseconds: milliseconds.toInt());
 
     var seconds = duration.inSeconds;
@@ -176,7 +179,13 @@ class Methods {
       if (tokens.isNotEmpty || minutes != 0) {
         tokens.add('$minutes');
       }
-      tokens.add('$seconds');
+      if (seconds < 10) {
+        tokens.add('0$seconds');
+      } else {
+        tokens.add('$seconds');
+      }
+
+      // tokens.add('$seconds');
 
       return tokens.join(':');
     }
