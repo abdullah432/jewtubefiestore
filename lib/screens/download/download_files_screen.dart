@@ -24,8 +24,6 @@ class DownloadFilesPage extends StatefulWidget {
 }
 
 class DownloadFilesPageState extends State<DownloadFilesPage> {
-  File file;
-
   @override
   void initState() {
     super.initState();
@@ -36,43 +34,39 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
     // }
   }
 
-  isDownloaded(VideoModel videoModel) async {
-//    var contain = Resources.Constant.listOfDownloadedFiles
-//        .where((element) => element.mp4Url == videoModel.mp4URL);
-//    if (contain.isNotEmpty) downloaded = true;
+  // isDownloaded(VideoModel videoModel) async {
+  //   final hasPermission = Platform.isAndroid
+  //       ? await Permission.storage.request().isGranted
+  //       : true;
 
-    final hasPermission = Platform.isAndroid
-        ? await Permission.storage.request().isGranted
-        : true;
-
-    if (hasPermission) {
-      final externalDir = await getDownloadDirectory();
-      print("Directory: ${externalDir.path}/videoModel.videoTitle.mp4");
-      String loc =
-          '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
-      File videoFile = new File(loc);
-      if (videoFile.existsSync()) {
-        var contain = Constant.listOfDownloadedFiles
-            .where((element) => element.videoURL == videoModel.videoURL);
-        if (contain.isEmpty) {
-          DatabaseHelper databaseHelper = DatabaseHelper();
-          //we need fileLocation, fileUrl, time
-          DownloadedFile downloadedFile = DownloadedFile(
-              videoURL: videoModel.videoURL,
-              fileLocation: loc,
-              downloadTime: DateTime.now().toString());
-          int result =
-              await databaseHelper.insertFile(downloadedFile: downloadedFile);
-          if (result != 0) {
-            //update DownloadedFilesList (inside Resourse class)
-            setState(() {
-              Methods.loadDownloadedFilesList();
-            });
-          }
-        }
-      }
-    }
-  }
+  //   if (hasPermission) {
+  //     final externalDir = await getDownloadDirectory();
+  //     print("Directory: ${externalDir.path}/videoModel.videoTitle.mp4");
+  //     String loc =
+  //         '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
+  //     File videoFile = new File(loc);
+  //     if (videoFile.existsSync()) {
+  //       var contain = Constant.listOfDownloadedFiles
+  //           .where((element) => element.videoURL == videoModel.videoURL);
+  //       if (contain.isEmpty) {
+  //         DatabaseHelper databaseHelper = DatabaseHelper();
+  //         //we need fileLocation, fileUrl, time
+  //         DownloadedFile downloadedFile = DownloadedFile(
+  //             videoURL: videoModel.videoURL,
+  //             fileLocation: loc,
+  //             downloadTime: DateTime.now().toString());
+  //         int result =
+  //             await databaseHelper.insertFile(downloadedFile: downloadedFile);
+  //         if (result != 0) {
+  //           //update DownloadedFilesList (inside Resourse class)
+  //           setState(() {
+  //             Methods.loadDownloadedFilesList();
+  //           });
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   Future<Directory> getDownloadDirectory() async {
     return Platform.isAndroid
@@ -103,7 +97,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
             itemBuilder: (BuildContext context, int index) {
               String filePath =
                   Constant.listOfDownloadedFiles[index].fileLocation;
-              file = File(filePath);
+              File file = File(filePath);
               String filename = basenameWithoutExtension(file.path);
               getThumbnail(index);
               return GestureDetector(
@@ -229,7 +223,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
                 //     });
                 //   }
 
-                file = File(
+                File file = File(
                     Constant.listOfDownloadedFiles[fileIndex].fileLocation);
                 file.delete().whenComplete(() async {
                   DatabaseHelper databaseHelper = DatabaseHelper();
@@ -278,9 +272,7 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (builder) => OfflineVideoPlayer(
-          oflineVideoPath: videoPath,
-        ),
+        builder: (builder) => OfflineVideoPlayer(oflineVideoPath: videoPath),
       ),
     );
   }

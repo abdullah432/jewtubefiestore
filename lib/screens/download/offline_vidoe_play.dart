@@ -1,10 +1,7 @@
-import 'dart:io';
 import 'dart:ui';
+import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
-import 'package:jewtubefirestore/model/video.dart';
 import 'package:path/path.dart';
-import 'package:chewie/chewie.dart';
-import 'package:video_player/video_player.dart';
 
 class OfflineVideoPlayer extends StatefulWidget {
   final String oflineVideoPath;
@@ -18,55 +15,15 @@ class OfflineVideoPlayer extends StatefulWidget {
 
 class _OfflineVideoPlayerState extends State<OfflineVideoPlayer>
     with SingleTickerProviderStateMixin {
-  VideoModel videoModel;
   bool isOfline;
-  String oflineVideoPath;
+  String offlineVideoPath;
 
-  _OfflineVideoPlayerState(this.oflineVideoPath);
+  _OfflineVideoPlayerState(this.offlineVideoPath);
 
-  //offline file
-  File file;
-
-  VideoPlayerController _videoPlayerController;
-  ChewieController _chewieController;
-
-  @override
-  void initState() {
-    file = File(oflineVideoPath);
-    _videoPlayerController = VideoPlayerController.file(file);
-
-    super.initState();
-    initVideoPlayer();
-    // //
-    // _chewieController = ChewieController(
-    //   // videoPlayerController: VideoPlayerController.network(videoModel.videoURL)..initialize(),
-    //   videoPlayerController: _videoPlayerController,
-    //   autoPlay: true,
-    //   looping: true,
-    //   // autoInitialize: true,
-    // );
-  }
-
-  Future<void> initVideoPlayer() async {
-    await _videoPlayerController.initialize();
-
-    print(_videoPlayerController.value.aspectRatio);
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
-      aspectRatio: _videoPlayerController.value.aspectRatio,
-      autoPlay: false,
-      looping: false,
-    );
-
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _videoPlayerController?.dispose();
-    _chewieController?.dispose();
-    super.dispose();
-  }
+  BetterPlayerController betterPlayerController;
+  BetterPlayerDataSource betterPlayerDataSource;
+  BetterPlayerControlsConfiguration controlsConfiguration;
+  BetterPlayerConfiguration betterPlayerConfiguration;
 
   @override
   Widget build(BuildContext context) {
@@ -85,17 +42,7 @@ class _OfflineVideoPlayerState extends State<OfflineVideoPlayer>
         child: Container(
           child: Column(
             children: <Widget>[
-              _videoPlayerController.value.isInitialized
-                  ? AspectRatio(
-                      aspectRatio: _videoPlayerController.value.aspectRatio,
-                      child: Chewie(
-                        controller: _chewieController,
-                      ),
-                    )
-                  : Container(
-                      height: 320,
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+              BetterPlayer.file(offlineVideoPath),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -106,7 +53,7 @@ class _OfflineVideoPlayerState extends State<OfflineVideoPlayer>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            basenameWithoutExtension(file.path),
+                            basenameWithoutExtension(offlineVideoPath),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],

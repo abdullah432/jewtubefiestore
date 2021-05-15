@@ -183,15 +183,17 @@ class Methods {
         tokens.add('$hours');
       }
       if (tokens.isNotEmpty || minutes != 0) {
-        tokens.add('$minutes');
+        if (minutes < 10) {
+          tokens.add('0$minutes');
+        } else {
+          tokens.add('$minutes');
+        }
       }
       if (seconds < 10) {
         tokens.add('0$seconds');
       } else {
         tokens.add('$seconds');
       }
-
-      // tokens.add('$seconds');
 
       return tokens.join(':');
     }

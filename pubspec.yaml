@@ -34,7 +34,8 @@ dependencies:
   sqflite: ^2.0.0+2
   permission_handler: ^6.0.1
   video_thumbnail: ^0.2.5+1
-  chewie: ^1.0.0
+  # chewie: ^1.0.0
+  better_player: ^0.0.66
   # aws_s3: ^0.1.1+hotfix.5
   aws_s3_upload: ^1.1.2
   provider: ^5.0.0

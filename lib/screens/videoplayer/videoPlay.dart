@@ -1,12 +1,11 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:chewie/chewie.dart';
+import 'package:better_player/better_player.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jewtubefirestore/enum/downloadstatus.dart';
 import 'package:jewtubefirestore/model/downloaded_files.dart';
@@ -20,7 +19,6 @@ import 'package:jewtubefirestore/widgets/videoItemWidget2.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final VideoModel videoModel;
@@ -39,8 +37,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   _VideoPlayerScreenState(this.videoModel);
 
-  VideoPlayerController _videoPlayerController;
-  ChewieController _chewieController;
+  BetterPlayerController betterPlayerController;
+  BetterPlayerDataSource betterPlayerDataSource;
+  BetterPlayerControlsConfiguration controlsConfiguration;
+  BetterPlayerConfiguration betterPlayerConfiguration;
   List subList = [];
 
   VideosService videosService;
@@ -62,15 +62,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   //download progress (Show download precentage when click on download button)
   String downloadProgress;
-  //
-  double deviceRatio;
+
   bool videoStreched = false;
 
   @override
   void initState() {
-    print('videouid: ' + videoModel.reference.id);
-    print('video url: ' + videoModel?.videoURL.toString());
-    _videoPlayerController = VideoPlayerController.network(videoModel.videoURL);
+    initVideoPlayer();
     //check if video is downloaded or not
     super.initState();
     /* Flutter download */
@@ -88,25 +85,32 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
     );
     _colorAnimation = ColorTween(begin: beginColor, end: endColor)
         .animate(_animationController);
-    //
-    initVideoPlayer();
     loadRecommendedVideosList();
   }
 
-  Future<void> initVideoPlayer() async {
-    await _videoPlayerController.initialize();
-    print('SystemUiOverlay.values: ');
-    print(SystemUiOverlay.values.toString());
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
-      aspectRatio: _videoPlayerController.value.aspectRatio,
-      showControls: true,
-      systemOverlaysAfterFullScreen: null,
-      autoPlay: false,
-      looping: false,
+  void initVideoPlayer() {
+    controlsConfiguration =
+        BetterPlayerControlsConfiguration(enableSkips: false);
+    betterPlayerConfiguration = BetterPlayerConfiguration(
+      autoPlay: true,
+      controlsConfiguration: controlsConfiguration,
+    );
+    betterPlayerDataSource = BetterPlayerDataSource(
+      BetterPlayerDataSourceType.network,
+      videoModel.videoURL,
+      notificationConfiguration: BetterPlayerNotificationConfiguration(
+        showNotification: true,
+        title: videoModel.videoTitle,
+        author: videoModel.channelName,
+        imageUrl: videoModel.thumbNail,
+        activityName: "MainActivity",
+      ),
     );
 
-    setState(() {});
+    betterPlayerController = BetterPlayerController(
+      betterPlayerConfiguration,
+      betterPlayerDataSource: betterPlayerDataSource,
+    );
   }
 
   loadRecommendedVideosList() {
@@ -123,22 +127,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
   }
 
   disposeProcess() {
-    _videoPlayerController?.dispose();
-    _chewieController?.dispose();
     _animationController?.dispose();
-
+    betterPlayerController?.dispose();
     _unbindBackgroundIsolate();
   }
 
   isDownloaded() async {
-    //first check if any download is in progress
-    // final tasks = await FlutterDownloader.loadTasks();
-    // print('tasks: ' + tasks.toString());
-    print('************************');
     final tasks = await FlutterDownloader.loadTasksWithRawQuery(
         query: 'SELECT * FROM task WHERE url = "${videoModel.videoURL}"');
-    print(tasks.toString());
-    print('************************');
 
     if (tasks.length != 0 && tasks[0].progress < 100) {
       downloadStatus = DownloadStatus.INPROGRESS;
@@ -217,17 +213,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         return;
       }
       _port.listen((dynamic data) async {
-        // print('Data: ' + data.toString());
-        // print('Data: ' + data[2].toString());
-        // downloadProgress = data[2].toString();
-        // String id = data[0];
         DownloadTaskStatus status = data[1];
-        //
-        print('*******************');
-        final alltasks = await FlutterDownloader.loadTasks();
-        print('alltasks: ' + alltasks.toString());
-        print('*******************');
-        //
+
+        // final alltasks = await FlutterDownloader.loadTasks();
+
         final tasks = await FlutterDownloader.loadTasksWithRawQuery(
             query: 'SELECT * FROM task WHERE url = "${videoModel.videoURL}"');
         print(tasks.toString());
@@ -239,7 +228,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           final externalDir = await getDownloadDirectory();
           fileLocation =
               '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
-          print("completed");
           _animationController.stop();
           setState(() {
             // downloaded = true;
@@ -249,10 +237,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           DatabaseHelper databaseHelper = DatabaseHelper();
           //we need fileLocation, fileUrl, time
           DownloadedFile downloadedFile = DownloadedFile(
-              videoURL: videoModel.videoURL,
-              // mp4Url: DumyData.videourl2,
-              fileLocation: fileLocation,
-              downloadTime: DateTime.now().toString());
+            videoURL: videoModel.videoURL,
+            fileLocation: fileLocation,
+            downloadTime: DateTime.now().toString(),
+          );
           int result =
               await databaseHelper.insertFile(downloadedFile: downloadedFile);
           if (result != 0) {
@@ -262,7 +250,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         } else if (status == DownloadTaskStatus.canceled ||
             status == DownloadTaskStatus.failed) {
           _animationController.stop();
-          print('failed or stop');
           setState(() {});
         } else {
           print('status: ' + status.toString());
@@ -289,14 +276,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   @override
   Widget build(BuildContext context) {
-    var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    final size = MediaQuery.of(context).size;
-    // print('isPortrait: ' + isPortrait.toString());
-    // print('_chewieController: ' + _chewieController.toString());
-    deviceRatio =
-        isPortrait ? (size.height / size.width) : (size.width / size.height);
-    // if (!isPortrait) _chewieController.enterFullScreen();
-
     return Scaffold(
       appBar: AppBar(
         title: Text(''),
@@ -312,18 +291,19 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         child: Container(
           child: Column(
             children: <Widget>[
-              _videoPlayerController.value.isInitialized
-                  ? AspectRatio(
-                      aspectRatio: _videoPlayerController.value.aspectRatio,
-                      child: Stack(children: [
-                        Chewie(
-                          controller: _chewieController,
-                        ),
-                      ]))
-                  : Container(
-                      height: 320,
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
+              BetterPlayer(controller: betterPlayerController),
+
+              // AspectRatio(
+              //     aspectRatio: _videoPlayerController.value.aspectRatio,
+              //     child: Stack(children: [
+              //       Chewie(
+              //         controller: _chewieController,
+              //       ),
+              //     ]))
+              // : Container(
+              //     height: 320,
+              //     child: Center(child: CircularProgressIndicator()),
+              //   ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -411,11 +391,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
                     );
                   },
                   onPlay: () {
-                    _videoPlayerController.pause();
+                    betterPlayerController.pause();
+                    // // _videoPlayerController.pause();
                     Methods.navigateToPage(
                       context,
                       VideoPlayerScreen(
-                          videoModel: recommendedVideosList[index]),
+                        videoModel: recommendedVideosList[index],
+                      ),
                     );
                   },
                 ),
@@ -440,7 +422,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         (defaultTargetPlatform == TargetPlatform.android)) {
       if (downloadStatus != DownloadStatus.DOWNLOADED &&
           downloadStatus != DownloadStatus.INPROGRESS &&
-          _videoPlayerController != null) {
+          betterPlayerController != null) {
         //update downloadstatus
         downloadStatus = DownloadStatus.INPROGRESS;
 
@@ -488,16 +470,5 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           message: "Download is not supported on web",
           toastLenght: Toast.LENGTH_LONG);
     }
-  }
-
-  void toggleScreenOrientation() {
-    if (MediaQuery.of(context).orientation == Orientation.portrait)
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeRight,
-        DeviceOrientation.landscapeLeft,
-      ]);
-    else
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   }
 }
