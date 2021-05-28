@@ -26,6 +26,44 @@ class _OfflineVideoPlayerState extends State<OfflineVideoPlayer>
   BetterPlayerConfiguration betterPlayerConfiguration;
 
   @override
+  void initState() {
+    initVideoPlayer();
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    betterPlayerController?.dispose();
+    super.dispose();
+  }
+
+  void initVideoPlayer() {
+    controlsConfiguration =
+        BetterPlayerControlsConfiguration(enableSkips: false);
+    betterPlayerConfiguration = BetterPlayerConfiguration(
+      autoPlay: true,
+      controlsConfiguration: controlsConfiguration,
+    );
+    betterPlayerDataSource = BetterPlayerDataSource(
+      BetterPlayerDataSourceType.file,
+      offlineVideoPath,
+      notificationConfiguration: BetterPlayerNotificationConfiguration(
+        showNotification: true,
+        title: basenameWithoutExtension(offlineVideoPath),
+        // author: videoModel.channelName,
+        // imageUrl: videoModel.thumbNail,
+        // activityName: "MainActivity",
+      ),
+    );
+
+    betterPlayerController = BetterPlayerController(
+      betterPlayerConfiguration,
+      betterPlayerDataSource: betterPlayerDataSource,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +80,8 @@ class _OfflineVideoPlayerState extends State<OfflineVideoPlayer>
         child: Container(
           child: Column(
             children: <Widget>[
-              BetterPlayer.file(offlineVideoPath),
+              BetterPlayer(controller: betterPlayerController),
+              // BetterPlayer.file(offlineVideoPath),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(

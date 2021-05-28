@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:better_player/better_player.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jewtubefirestore/enum/downloadstatus.dart';
@@ -93,6 +92,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
         BetterPlayerControlsConfiguration(enableSkips: false);
     betterPlayerConfiguration = BetterPlayerConfiguration(
       autoPlay: true,
+      fit: BoxFit.contain,
       controlsConfiguration: controlsConfiguration,
     );
     betterPlayerDataSource = BetterPlayerDataSource(
@@ -111,6 +111,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
       betterPlayerConfiguration,
       betterPlayerDataSource: betterPlayerDataSource,
     );
+
+    betterPlayerController.addEventsListener((BetterPlayerEvent event) {
+      if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
+        betterPlayerController.setOverriddenAspectRatio(
+            betterPlayerController.videoPlayerController.value.aspectRatio);
+        setState(() {});
+      }
+    });
   }
 
   loadRecommendedVideosList() {
@@ -292,6 +300,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           child: Column(
             children: <Widget>[
               BetterPlayer(controller: betterPlayerController),
+
+              // AspectRatio(
+              //   aspectRatio: betterPlayerController
+              //       .videoPlayerController.value.aspectRatio,
+              //   child: Stack(children: [
+              //     BetterPlayer(controller: betterPlayerController),
+              //   ]),
+              // ),
 
               // AspectRatio(
               //     aspectRatio: _videoPlayerController.value.aspectRatio,

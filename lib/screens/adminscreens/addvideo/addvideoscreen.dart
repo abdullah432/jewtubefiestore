@@ -74,8 +74,8 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
 
       try {
         String result = await AwsS3.uploadFile(
-          accessKey: "accesskey here",
-          secretKey: "secret key here",
+          accessKey: "AKIAWCKQN7QY4TMFT4NR",
+          secretKey: "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",
           file: File(videofile.path),
           filename: Path.basename(videofile.path).toString(),
           bucket: "jewtube-source-14c5ef0ws4cpc",
