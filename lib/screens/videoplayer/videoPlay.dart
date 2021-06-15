@@ -168,7 +168,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
       if (hasPermission) {
         final externalDir = await getDownloadDirectory();
-        print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
+        // print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
         String loc =
             '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
         File videoFile = new File(loc);
@@ -300,26 +300,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
           child: Column(
             children: <Widget>[
               BetterPlayer(controller: betterPlayerController),
-
-              // AspectRatio(
-              //   aspectRatio: betterPlayerController
-              //       .videoPlayerController.value.aspectRatio,
-              //   child: Stack(children: [
-              //     BetterPlayer(controller: betterPlayerController),
-              //   ]),
-              // ),
-
-              // AspectRatio(
-              //     aspectRatio: _videoPlayerController.value.aspectRatio,
-              //     child: Stack(children: [
-              //       Chewie(
-              //         controller: _chewieController,
-              //       ),
-              //     ]))
-              // : Container(
-              //     height: 320,
-              //     child: Center(child: CircularProgressIndicator()),
-              //   ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -458,18 +438,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen>
 
         if (hasPermission) {
           final externalDir = await getDownloadDirectory();
-          // print("Directory: ${externalDir.path}/${videoModel.videoTitle}.mp4");
-          // fileLocation =
-          //     '${externalDir.path}/${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4';
-          final id = await FlutterDownloader.enqueue(
+
+          // final id = await FlutterDownloader.enqueue(
+          //   url: videoModel.videoURL,
+          //   // url: DumyData.videourl3,
+          //   // url: DumyData.exampleProfileUrl,
+          //   savedDir: externalDir.path,
+          //   fileName:
+          //       "${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4",
+          //   showNotification: true,
+          //   openFileFromNotification: false,
+          // );
+
+          print(externalDir.path);
+
+          FlutterDownloader.enqueue(
             url: videoModel.videoURL,
-            // url: DumyData.videourl3,
-            // url: DumyData.exampleProfileUrl,
             savedDir: externalDir.path,
-            fileName:
-                "${videoModel.videoTitle.replaceAll(RegExp(r"\s+"), "_")}.mp4",
             showNotification: true,
-            openFileFromNotification: false,
+            openFileFromNotification: true,
           );
           Methods.showToast(message: "Downloading started.");
         } else {

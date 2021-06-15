@@ -37,7 +37,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<ChannelService>(context, listen: false).isRefresh = false;
+    ChannelService channelService =
+        Provider.of<ChannelService>(context, listen: false);
+    channelService.isRefresh = true;
     isUserSignedIn();
     return Scaffold(body: Consumer<ChannelService>(
       builder: (context, channelservice, child) {
@@ -48,8 +50,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             channelservice.subscribedChannelVideosList.length == 0) {
           refreshData(channelservice);
           return Center(child: Text('No data available'));
-        }
-        refreshData(channelservice);
+        } else if (channelservice.isRefresh &&
+            channelservice.subscribedChannelList.length > 0)
+          refreshData(channelservice);
 
         return screenContent(channelservice);
       },

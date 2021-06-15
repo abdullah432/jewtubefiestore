@@ -154,7 +154,7 @@ class Methods {
   }
 
   static String millisecondsToHMS(double milliseconds) {
-    print(milliseconds.toString());
+    // print(milliseconds.toString());
 
     // milliseconds = 364192.0;
     Duration duration = Duration(milliseconds: milliseconds.toInt());

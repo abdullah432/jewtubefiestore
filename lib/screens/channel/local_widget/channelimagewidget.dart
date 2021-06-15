@@ -40,7 +40,7 @@ class _ChannelImageWidgetState extends State<ChannelImageWidget> {
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
                         image: DecorationImage(
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fitHeight,
                       image:
                           widget.profileUrl == "" || widget.profileUrl == null
                               ? AssetImage("assets/no_img.png")
@@ -68,42 +68,20 @@ class _ChannelImageWidgetState extends State<ChannelImageWidget> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                widget.channelName,
-                                style: TextStyle(fontSize: 20),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 1.5,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  widget.channelName,
+                                  style: TextStyle(fontSize: 20),
+                                  overflow: TextOverflow.clip,
+                                ),
                               ),
                             ),
-                            SubscribeWidget(
-                              channelID: widget.channelId,
-                            ),
-                            // Row(
-                            //   mainAxisAlignment:
-                            //       MainAxisAlignment.spaceBetween,
-                            //   children: [
-                            //     SubscribeWidget(
-                            //       channelID: widget.channelId,
-                            //     ),
-                            //     // InkWell(
-                            //     //     onTap: () {
-                            //     //       // Methods.shareLink(video: video);
-                            //     //     },
-                            //     //     child: Icon(Icons.share)),
-                            //   ],
-                            // ),
+                            SubscribeWidget(channelID: widget.channelId),
                           ],
                         ),
-
-                        // Constant.isAdmin
-                        //     ? IconButton(
-                        //         icon: Icon(
-                        //           Icons.delete,
-                        //           color: Colors.red,
-                        //         ),
-                        //         onPressed: () {},
-                        //       )
-                        //     : Container(),
                       ],
                     ),
                   ),

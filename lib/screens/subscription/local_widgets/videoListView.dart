@@ -71,6 +71,7 @@ class VideoList extends StatelessWidget {
     return ListView.builder(
       itemCount: videos.length,
       shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         return videos.length > 0
             ? videoStyleIndex == 1
