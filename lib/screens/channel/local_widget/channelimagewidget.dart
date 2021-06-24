@@ -35,18 +35,18 @@ class _ChannelImageWidgetState extends State<ChannelImageWidget> {
               child: Column(
                 children: [
                   //Channel banner image
-                  Container(
-                    height: 190,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                      fit: BoxFit.fitHeight,
-                      image:
-                          widget.profileUrl == "" || widget.profileUrl == null
-                              ? AssetImage("assets/no_img.png")
-                              : CachedNetworkImageProvider(widget.profileUrl),
-                    )),
-                  ),
+                  // Container(
+                  //   height: 190,
+                  //   width: MediaQuery.of(context).size.width,
+                  //   decoration: BoxDecoration(
+                  //       image: DecorationImage(
+                  //     fit: BoxFit.fitHeight,
+                  //     image:
+                  //         widget.profileUrl == "" || widget.profileUrl == null
+                  //             ? AssetImage("assets/no_img.png")
+                  //             : CachedNetworkImageProvider(widget.profileUrl),
+                  //   )),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(

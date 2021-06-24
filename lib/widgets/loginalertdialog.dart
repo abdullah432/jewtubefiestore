@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:jewtubefirestore/utils/custom_colors.dart';
 
 class EnableSubscriptionDialogBox extends StatelessWidget {
   final VoidCallback onLoginClick;
@@ -28,7 +29,7 @@ class EnableSubscriptionDialogBox extends StatelessWidget {
           Icon(
             FlutterIcons.info_outline_mdi,
             size: 100,
-            color: Colors.blue,
+            color: CustomColor.primaryColor,
           ),
           SizedBox(height: 10.0),
           Text(
@@ -52,7 +53,7 @@ class EnableSubscriptionDialogBox extends StatelessWidget {
             child: TextButton(
               onPressed: onLoginClick,
               style: TextButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: CustomColor.primaryColor,
               ),
               child: Text(
                 'LOGIN',
