@@ -78,17 +78,14 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
       child: Column(
         // mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           Text(
             'Downloads',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
           ),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
           ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemCount: Constant.listOfDownloadedFiles.length,
@@ -119,17 +116,11 @@ class DownloadFilesPageState extends State<DownloadFilesPage> {
                               child: Center(child: CircularProgressIndicator()),
                             );
                           }
-                          return Image.memory(
-                            snapshot.data,
-                            fit: BoxFit.cover,
-                            width: 160,
-                            height: 90,
-                          );
+                          return Image.memory(snapshot.data,
+                              fit: BoxFit.cover, width: 160, height: 90);
                         },
                       ),
-                      SizedBox(
-                        width: 10,
-                      ),
+                      SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           filename,

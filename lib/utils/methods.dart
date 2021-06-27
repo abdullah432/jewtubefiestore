@@ -93,7 +93,7 @@ class Methods {
   }
 
   static shareLink({@required VideoModel video}) {
-    Share.share(video.videoTitle);
+    Share.share(video.videoURL);
   }
 
   static navigateToPage(context, page) {
